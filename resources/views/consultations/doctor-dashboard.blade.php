@@ -743,24 +743,47 @@
     </section>
 @endsection
 
-@session('footer')
+@section('footer')
 
-@endsession
+@endsection
 
 @push('script')
     <script>
         $(document).ready(function () {
+
+            // Prevent infinite reload loops
+            var reloadKey = 'appt_reload_' + window.location.pathname;
+            var reloadCount = parseInt(sessionStorage.getItem(reloadKey) || '0', 10);
+
+            setTimeout(function () {
+                sessionStorage.setItem(reloadKey, '0');
+            }, 10000);
+
+            function safeReload() {
+                if (reloadCount < 3) {
+                    sessionStorage.setItem(reloadKey, String(reloadCount + 1));
+                    location.reload();
+                } else {
+                    $('.countdown-timer').each(function () {
+                        $(this).text('Ready — please refresh the page');
+                    });
+                }
+            }
+
             function updateCountdowns() {
                 $('.countdown-timer').each(function () {
                     var $el = $(this);
                     var targetStr = $el.data('target');
+                    if (!targetStr) return;
+
                     var target = new Date(targetStr);
                     var windowStart = new Date(target.getTime() - 15 * 60 * 1000);
                     var now = new Date();
                     var diff = windowStart - now;
 
                     if (diff <= 0) {
-                        location.reload();
+                        $el.text('Meeting is ready!');
+                        safeReload();
                         return;
                     }
 

@@ -29,14 +29,14 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'doctor_id' => 'required|exists:users,id',
-            'date'      => 'required|date|after_or_equal:today',
+            'date' => 'required|date|after_or_equal:today',
         ]);
 
         // Fixed daily time slots
         $allSlots = [
             '09:00 AM',
             '10:30 AM',
-            '10:00 PM',
+            '10:55 PM',
             '03:00 PM',
         ];
 
@@ -50,9 +50,9 @@ class AppointmentController extends Controller
         $available = array_values(array_diff($allSlots, $bookedSlots));
 
         return response()->json([
-            'date'      => $request->date,
+            'date' => $request->date,
             'doctor_id' => (int) $request->doctor_id,
-            'slots'     => $available,
+            'slots' => $available,
         ]);
     }
 
@@ -64,12 +64,12 @@ class AppointmentController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'doctor_id'        => 'required|exists:users,id',
+            'doctor_id' => 'required|exists:users,id',
             'appointment_date' => 'required|date|after_or_equal:today',
-            'time_slot'        => 'required|string',
-            'patient_name'     => 'required|string|max:255',
-            'patient_email'    => 'required|email|max:255',
-            'patient_phone'    => 'nullable|string|max:30',
+            'time_slot' => 'required|string',
+            'patient_name' => 'required|string|max:255',
+            'patient_email' => 'required|email|max:255',
+            'patient_phone' => 'nullable|string|max:30',
         ]);
 
         // ── Double-check the slot is still free ──────────────────────
@@ -91,22 +91,22 @@ class AppointmentController extends Controller
 
         // ── Generate meeting token & URL ─────────────────────────────
         $meetingToken = Str::random(32);
-        $meetingUrl   = 'https://meet.jit.si/basirah-' . $meetingToken;
+        $meetingUrl = 'https://meet.jit.si/basirah-' . $meetingToken;
 
         // ── Create the appointment ───────────────────────────────────
         $appointment = Appointment::create([
-            'user_id'          => auth()->id(),
-            'doctor_id'        => $doctor->id,
-            'patient_name'     => $validated['patient_name'],
-            'patient_email'    => $validated['patient_email'],
-            'patient_phone'    => $validated['patient_phone'] ?? null,
+            'user_id' => auth()->id(),
+            'doctor_id' => $doctor->id,
+            'patient_name' => $validated['patient_name'],
+            'patient_email' => $validated['patient_email'],
+            'patient_phone' => $validated['patient_phone'] ?? null,
             'appointment_date' => $validated['appointment_date'],
             'appointment_time' => $this->slotToTime($validated['time_slot']),
-            'time_slot'        => $validated['time_slot'],
-            'price_paid'       => $doctor->price,
-            'status'           => 'pending',
-            'meeting_token'    => $meetingToken,
-            'meeting_url'      => $meetingUrl,
+            'time_slot' => $validated['time_slot'],
+            'price_paid' => $doctor->price,
+            'status' => 'pending',
+            'meeting_token' => $meetingToken,
+            'meeting_url' => $meetingUrl,
         ]);
 
         // ── Store patient email in session for guest lookup ──────────
@@ -117,8 +117,8 @@ class AppointmentController extends Controller
         }
 
         return response()->json([
-            'success'     => true,
-            'message'     => 'Appointment booked successfully!',
+            'success' => true,
+            'message' => 'Appointment booked successfully!',
             'appointment' => $appointment->only('id', 'appointment_date', 'time_slot', 'price_paid', 'status', 'meeting_url'),
         ], 201);
     }
@@ -173,7 +173,7 @@ class AppointmentController extends Controller
         $pastAppointments = Appointment::where('doctor_id', $doctor->id)
             ->where(function ($q) {
                 $q->whereDate('appointment_date', '<', today())
-                  ->orWhere('status', 'completed');
+                    ->orWhere('status', 'completed');
             })
             ->orderBy('appointment_date', 'desc')
             ->limit(10)

@@ -613,10 +613,34 @@
             // ========================================
             // COUNTDOWN TIMERS
             // ========================================
+
+            // Prevent infinite reload loops: track reload attempts
+            var reloadKey = 'appt_reload_' + window.location.pathname;
+            var reloadCount = parseInt(sessionStorage.getItem(reloadKey) || '0', 10);
+
+            // Reset reload counter after 10 seconds on a successful page load
+            setTimeout(function () {
+                sessionStorage.setItem(reloadKey, '0');
+            }, 10000);
+
+            function safeReload() {
+                if (reloadCount < 3) {
+                    sessionStorage.setItem(reloadKey, String(reloadCount + 1));
+                    location.reload();
+                } else {
+                    // Max reloads reached — show a manual refresh message
+                    $('.countdown-timer').each(function () {
+                        $(this).text('Ready — please refresh the page');
+                    });
+                }
+            }
+
             function updateCountdowns() {
                 $('.countdown-timer').each(function () {
                     var $el = $(this);
                     var targetStr = $el.data('target');
+                    if (!targetStr) return;
+
                     var target = new Date(targetStr);
                     // Open window 15 minutes early
                     var windowStart = new Date(target.getTime() - 15 * 60 * 1000);
@@ -625,15 +649,18 @@
 
                     if (diff <= 0) {
                         // Time to reload — the meeting link should now be active
-                        location.reload();
+                        $el.text('Meeting is ready!');
+                        safeReload();
                         return;
                     }
 
-                    var hours = Math.floor(diff / (1000 * 60 * 60));
+                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     var seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
                     var parts = [];
+                    if (days > 0) parts.push(days + 'd');
                     if (hours > 0) parts.push(hours + 'h');
                     parts.push(minutes + 'm');
                     parts.push(seconds + 's');
