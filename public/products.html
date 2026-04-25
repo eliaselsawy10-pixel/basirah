@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Basirah — Shop Prescription Medical Glasses. Find frames that fit your face shape. Premium eyewear for every style.">
+    <title>Prescription Medical Glasses — Basirah</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* ========== CSS CUSTOM PROPERTIES ========== */
+        :root {
+            --primary: #BDE3F9;
+            --primary-hover: #9AD4F5;
+            --primary-dark: #68B8E8;
+            --dark-blue: #1D3557;
+            --dark-blue-hover: #274b78;
+            --dark: #1a1a2e;
+            --body-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --border-light: #e4e8ec;
+            --section-bg: #f8fafc;
+            --font-family: 'Inter', sans-serif;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-family); color: var(--text-primary); background: var(--body-bg); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        img { max-width: 100%; height: auto; }
+        a { text-decoration: none; transition: var(--transition); }
+
+        /* ========== NAVBAR ========== */
+        .navbar-basirah { background: var(--dark-blue); padding: 10px 0; position: sticky; top: 0; z-index: 1050; }
+        .navbar-basirah.scrolled { box-shadow: 0 2px 12px rgba(29,53,87,0.3); }
+        .navbar-brand-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.3rem; color: #fff; }
+        .navbar-brand-logo .logo-icon { width: 32px; height: 32px; background: var(--primary); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--dark-blue); }
+        .navbar-basirah .nav-link { color: rgba(255,255,255,0.75); font-weight: 500; font-size: 0.88rem; padding: 8px 14px !important; border-radius: var(--radius-sm); transition: var(--transition); }
+        .navbar-basirah .nav-link:hover, .navbar-basirah .nav-link.active { color: #fff; }
+        .navbar-basirah .nav-link.active { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+
+        .nav-search { position: relative; }
+        .nav-search input { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 24px; padding: 7px 16px 7px 36px; font-size: 0.82rem; width: 220px; transition: var(--transition); }
+        .nav-search input::placeholder { color: rgba(255,255,255,0.5); }
+        .nav-search input:focus { outline: none; background: rgba(255,255,255,0.2); border-color: var(--primary); width: 260px; }
+        .nav-search .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+
+        .nav-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); border: none; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; transition: var(--transition); position: relative; cursor: pointer; }
+        .nav-icon-btn:hover { background: rgba(255,255,255,0.2); }
+        .nav-icon-btn .badge-count { position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; background: var(--primary); color: var(--dark-blue); font-size: 0.65rem; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .nav-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; cursor: pointer; }
+
+        /* ========== BREADCRUMB & PAGE HEADER ========== */
+        .page-header { background: #fff; padding: 28px 0 24px; border-bottom: 1px solid var(--border-light); }
+        .breadcrumb-nav { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; }
+        .breadcrumb-nav a { color: var(--text-muted); }
+        .breadcrumb-nav a:hover { color: var(--dark-blue); }
+        .breadcrumb-nav span { color: var(--dark-blue); font-weight: 600; }
+        .page-header h1 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+        .page-header .subtitle { font-size: 0.85rem; color: var(--text-muted); }
+        .sort-dropdown select { border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 32px 8px 14px; font-size: 0.82rem; font-family: var(--font-family); color: var(--text-primary); background: #fff; cursor: pointer; appearance: auto; }
+
+        /* ========== FACE SHAPE SELECTOR ========== */
+        .face-shape-section { background: #fff; padding: 32px 0; border-bottom: 1px solid var(--border-light); }
+        .face-shape-section .section-title { text-align: center; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dark-blue); margin-bottom: 6px; }
+        .face-shape-section .section-sub { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
+        .face-shape-section .section-sub b { color: var(--dark-blue); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+        .face-card { text-align: center; cursor: pointer; padding: 14px 10px; border-radius: var(--radius-md); border: 2px solid transparent; transition: var(--transition); position: relative; }
+        .face-card:hover { background: #f0f7fd; }
+        .face-card.active { background: var(--dark-blue); border-color: var(--dark-blue); border-radius: var(--radius-lg); }
+        .face-card.active .face-title, .face-card.active .face-desc { color: #fff; }
+        .face-card.active::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 8px; right: 8px; color: var(--primary); font-size: 0.9rem; }
+        .face-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; display: block; border: 3px solid var(--border-light); }
+        .face-card.active .face-img { border-color: var(--primary); }
+        .face-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; color: var(--text-primary); }
+        .face-desc { font-size: 0.68rem; color: var(--text-muted); line-height: 1.3; }
+
+        /* ========== SIDEBAR FILTERS ========== */
+        .filters-sidebar { background: #fff; border-radius: var(--radius-md); padding: 0; position: sticky; top: 80px; }
+        .filter-group { padding: 18px 20px; border-bottom: 1px solid var(--border-light); }
+        .filter-group:last-child { border-bottom: none; }
+        .filter-group h6 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-primary); margin-bottom: 14px; }
+
+        /* Range slider */
+        .price-range-display { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
+        .price-slider { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: #e0e0e0; border-radius: 4px; outline: none; }
+        .price-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--dark-blue); border-radius: 50%; cursor: pointer; }
+
+        /* Checkboxes */
+        .filter-check { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer; font-size: 0.82rem; color: var(--text-secondary); }
+        .filter-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--dark-blue); cursor: pointer; }
+        .filter-check:hover { color: var(--dark-blue); }
+
+        /* Shape buttons */
+        .shape-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .shape-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 1.5px solid var(--border-light); border-radius: var(--radius-sm); background: #fff; cursor: pointer; transition: var(--transition); font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; }
+        .shape-btn i { font-size: 1.1rem; }
+        .shape-btn:hover, .shape-btn.active { border-color: var(--dark-blue); color: var(--dark-blue); background: #f0f5fa; }
+
+        .brand-select { width: 100%; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 0.82rem; font-family: var(--font-family); color: var(--text-secondary); background: #fff; }
+
+        /* ========== PRODUCT CARDS ========== */
+        .product-card { background: var(--card-bg); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); transition: var(--transition); position: relative; height: 100%; display: flex; flex-direction: column; }
+        .product-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); border-color: var(--primary); }
+        .product-card .heart-icon { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border: 1px solid var(--border-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); z-index: 5; color: var(--text-muted); font-size: 0.8rem; }
+        .product-card .heart-icon:hover { background: #ffe0e6; color: #e74c3c; border-color: #ffb3c1; }
+        .product-card .heart-icon.active { background: #ffe0e6; color: #e74c3c; border-color: #ffb3c1; }
+
+        .product-badge { position: absolute; top: 12px; left: 12px; padding: 3px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; z-index: 5; }
+        .badge-bestseller { background: var(--dark-blue); color: #fff; }
+        .badge-new { background: #198754; color: #fff; }
+
+        .product-img-wrapper { height: 180px; display: flex; align-items: center; justify-content: center; padding: 16px; background: #f9fafb; }
+        .product-img-wrapper img { max-height: 130px; object-fit: contain; transition: var(--transition); }
+        .product-card:hover .product-img-wrapper img { transform: scale(1.06); }
+
+        .product-info { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+        .product-title-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .product-info h5 { font-size: 0.92rem; font-weight: 700; margin: 0; }
+        .product-info .price { font-size: 0.95rem; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
+        .product-info .product-desc { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; }
+
+        .color-swatches { display: flex; gap: 5px; margin-bottom: 14px; }
+        .color-swatch { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; transition: var(--transition); }
+        .color-swatch:hover, .color-swatch.active { border-color: var(--dark-blue); transform: scale(1.15); }
+
+        .btn-add-cart { background: var(--dark-blue); color: #fff; font-weight: 600; font-size: 0.78rem; padding: 10px 0; border: none; border-radius: var(--radius-sm); transition: var(--transition); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: auto; }
+        .btn-add-cart:hover { background: var(--dark-blue-hover); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(29,53,87,0.3); }
+
+        /* ========== PAGINATION ========== */
+        .pagination-wrapper { padding: 32px 0; display: flex; justify-content: center; }
+        .pagination .page-link { border: 1px solid var(--border-light); color: var(--text-secondary); font-size: 0.82rem; font-weight: 500; padding: 8px 14px; margin: 0 2px; border-radius: var(--radius-sm) !important; transition: var(--transition); }
+        .pagination .page-link:hover { background: #eef5fb; color: var(--dark-blue); border-color: var(--primary); }
+        .pagination .page-item.active .page-link { background: var(--dark-blue); border-color: var(--dark-blue); color: #fff; }
+
+        /* ========== FOOTER ========== */
+        .footer-section { background: #f8fafc; padding: 60px 0 0; border-top: 1px solid var(--border-light); }
+        .footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.2rem; color: var(--text-primary); margin-bottom: 14px; }
+        .footer-logo .logo-icon { width: 28px; height: 28px; background: var(--primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .footer-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; max-width: 280px; }
+        .footer-social { display: flex; gap: 12px; }
+        .footer-social a { width: 36px; height: 36px; border-radius: 50%; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: 0.9rem; transition: var(--transition); }
+        .footer-social a:hover { background: var(--primary); color: var(--text-primary); transform: translateY(-2px); }
+        .footer-heading { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: var(--text-muted); font-size: 0.82rem; }
+        .footer-links a:hover { color: var(--primary-dark); padding-left: 4px; }
+        .footer-bottom { background: #f0f2f5; padding: 20px 0; margin-top: 40px; }
+        .footer-bottom p { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+        .footer-bottom-links { display: flex; gap: 20px; justify-content: flex-end; }
+        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-bottom-links a:hover { color: var(--primary-dark); }
+
+        /* ========== MOBILE FILTER TOGGLE ========== */
+        .filter-toggle-btn { display: none; background: var(--dark-blue); color: #fff; border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; width: 100%; }
+        .filter-toggle-btn i { margin-right: 6px; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 991.98px) {
+            .filter-toggle-btn { display: flex; align-items: center; justify-content: center; }
+            .filters-sidebar { display: none; position: relative; top: 0; margin-bottom: 20px; }
+            .filters-sidebar.show { display: block; }
+            .face-card { padding: 10px 6px; }
+            .face-img { width: 60px; height: 60px; }
+        }
+        @media (max-width: 767.98px) {
+            .page-header h1 { font-size: 1.35rem; }
+            .nav-search input { width: 150px; }
+            .face-shape-section .section-title { font-size: 0.85rem; }
+            .footer-bottom-links { justify-content: flex-start; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeInUp 0.5s ease forwards; }
+    </style>
+</head>
+<body>
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar navbar-expand-lg navbar-basirah" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-logo" href="#">
+                <span class="logo-icon"><i class="fa-solid fa-glasses"></i></span>
+                Basirah
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto gap-1">
+                    <li class="nav-item"><a class="nav-link active" href="#" id="nav-contact-lenses">Contact Lenses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="nav-eyeglasses">Eyeglasses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="nav-accessories">Accessories</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="nav-orders">My Orders</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="nav-search d-none d-md-block">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" placeholder="Search brands or colors..." id="search-input">
+                    </div>
+                    <button class="nav-icon-btn" id="btn-cart" aria-label="Cart">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="badge-count">1</span>
+                    </button>
+                    <button class="nav-icon-btn d-none d-md-flex" id="btn-settings" aria-label="Settings">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                    <img src="https://i.pravatar.cc/80?img=12" alt="User avatar" class="nav-avatar d-none d-md-block" id="user-avatar">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== PAGE HEADER ========== -->
+    <section class="page-header" id="page-header">
+        <div class="container">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="breadcrumb-nav">
+                        <a href="#">HOME</a> &rsaquo; <a href="#">SHOP</a> &rsaquo; <span>MEDICAL PRESCRIPTION</span>
+                    </div>
+                    <h1>Prescription Medical Glasses</h1>
+                    <p class="subtitle">Optometrist-approved frames for superior clarity and long-wear comfort.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="d-inline-flex align-items-center gap-2">
+                        <span style="font-size:0.82rem;color:var(--text-muted);">Sort by:</span>
+                        <select class="sort-dropdown" id="sort-select">
+                            <option>Most Popular</option>
+                            <option>Price: Low to High</option>
+                            <option>Price: High to Low</option>
+                            <option>Newest First</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FACE SHAPE SELECTOR ========== -->
+    <section class="face-shape-section" id="face-shapes">
+        <div class="container">
+            <p class="section-title">Find Frames That Fit Your Face</p>
+            <p class="section-sub">Choose your <b>face shape</b> to see the best matches</p>
+            <div class="row g-3 justify-content-center">
+                <div class="col-4 col-md-2"><div class="face-card active" data-shape="oval"><img src="https://i.pravatar.cc/160?img=47" alt="Oval face" class="face-img"><div class="face-title">Oval</div><div class="face-desc">Balanced Proportions</div></div></div>
+                <div class="col-4 col-md-2"><div class="face-card" data-shape="round"><img src="https://i.pravatar.cc/160?img=32" alt="Round face" class="face-img"><div class="face-title">Round</div><div class="face-desc">Soft &amp; Curvy</div></div></div>
+                <div class="col-4 col-md-2"><div class="face-card" data-shape="square"><img src="https://i.pravatar.cc/160?img=11" alt="Square face" class="face-img"><div class="face-title">Square</div><div class="face-desc">Strong Jawline</div></div></div>
+                <div class="col-4 col-md-2"><div class="face-card" data-shape="triangle"><img src="https://i.pravatar.cc/160?img=51" alt="Triangle face" class="face-img"><div class="face-title">Triangle</div><div class="face-desc">Wide Forehead</div></div></div>
+                <div class="col-4 col-md-2"><div class="face-card" data-shape="heart"><img src="https://i.pravatar.cc/160?img=5" alt="Heart face" class="face-img"><div class="face-title">Heart</div><div class="face-desc">Narrow Chin</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <section class="py-4" id="products-section">
+        <div class="container">
+            <div class="row g-4">
+
+                <!-- SIDEBAR FILTERS -->
+                <div class="col-lg-3">
+                    <button class="filter-toggle-btn" id="filter-toggle"><i class="fa-solid fa-sliders"></i> Show Filters</button>
+                    <div class="filters-sidebar" id="filters-sidebar">
+                        <!-- Price Range -->
+                        <div class="filter-group">
+                            <h6>Price Range</h6>
+                            <div class="price-range-display"><span id="price-min">$0</span><span id="price-max">$500+</span></div>
+                            <input type="range" class="price-slider" min="0" max="500" value="500" id="price-range-slider">
+                        </div>
+                        <!-- Quick Filters -->
+                        <div class="filter-group">
+                            <h6>Quick Filters</h6>
+                            <label class="filter-check"><input type="checkbox" checked id="chk-bestsellers"> Best Sellers</label>
+                            <label class="filter-check"><input type="checkbox" id="chk-newarrivals"> New Arrivals</label>
+                        </div>
+                        <!-- Frame Material -->
+                        <div class="filter-group">
+                            <h6>Frame Material</h6>
+                            <label class="filter-check"><input type="checkbox" id="chk-titanium"> Pure Titanium</label>
+                            <label class="filter-check"><input type="checkbox" id="chk-acetate"> Eco-Acetate</label>
+                            <label class="filter-check"><input type="checkbox" id="chk-metal"> Lightweight Metal</label>
+                        </div>
+                        <!-- Frame Shape -->
+                        <div class="filter-group">
+                            <h6>Frame Shape</h6>
+                            <div class="shape-grid">
+                                <button class="shape-btn" data-shape="round" id="shape-round"><i class="fa-regular fa-circle"></i> Round</button>
+                                <button class="shape-btn active" data-shape="square" id="shape-square"><i class="fa-regular fa-square"></i> Square</button>
+                                <button class="shape-btn" data-shape="cateye" id="shape-cateye"><i class="fa-solid fa-play fa-rotate-270"></i> Cat Eye</button>
+                                <button class="shape-btn" data-shape="geometric" id="shape-geometric"><i class="fa-solid fa-diamond"></i> Geometric</button>
+                            </div>
+                        </div>
+                        <!-- Brand -->
+                        <div class="filter-group">
+                            <h6>Brand</h6>
+                            <select class="brand-select" id="brand-select">
+                                <option>All Brands</option>
+                                <option>Ray-Ban</option>
+                                <option>Oakley</option>
+                                <option>Tom Ford</option>
+                                <option>Gucci</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT GRID -->
+                <div class="col-lg-9">
+                    <div class="row g-3" id="product-grid">
+                        <!-- Product 1 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-1">
+                                <span class="product-badge badge-bestseller">Best Seller</span>
+                                <div class="heart-icon"><i class="fa-regular fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1574258495973-f7977603b6d2?w=400&h=300&fit=crop" alt="Titanium Classic"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Titanium Classic</h5><span class="price">$189.99</span></div>
+                                    <p class="product-desc">Ultra-lightweight aerospace titanium frame for all-day comfort.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#8B8B8B;" title="Silver"></span><span class="color-swatch" style="background:#1a1a2e;" title="Black"></span><span class="color-swatch" style="background:#8B4513;" title="Brown"></span></div>
+                                    <button class="btn-add-cart" data-product="Titanium Classic" data-price="189.99"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product 2 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-2">
+                                <div class="heart-icon"><i class="fa-regular fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=300&fit=crop" alt="Modern Rectangular"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Modern Rectangular</h5><span class="price">$129.99</span></div>
+                                    <p class="product-desc">Polished acetate with flexible hinges for a secure fit.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#2c2c2c;" title="Black"></span><span class="color-swatch" style="background:#1D3557;" title="Navy"></span></div>
+                                    <button class="btn-add-cart" data-product="Modern Rectangular" data-price="129.99"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product 3 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-3">
+                                <span class="product-badge badge-new">New</span>
+                                <div class="heart-icon active"><i class="fa-solid fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=400&h=300&fit=crop" alt="Eco-Round Minimal"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Eco-Round Minimal</h5><span class="price">$145.50</span></div>
+                                    <p class="product-desc">Sustainable bio-acetate frame with a minimalist aesthetic.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#C08050;" title="Tortoise"></span><span class="color-swatch" style="background:#2c2c2c;" title="Black"></span></div>
+                                    <button class="btn-add-cart" data-product="Eco-Round Minimal" data-price="145.50"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product 4 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-4">
+                                <div class="heart-icon"><i class="fa-regular fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1577803645773-f96470509666?w=400&h=300&fit=crop" alt="Executive Gold"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Executive Gold</h5><span class="price">$210.00</span></div>
+                                    <p class="product-desc">18k gold-plated surgical steel frame for a refined look.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#D4A843;" title="Gold"></span></div>
+                                    <button class="btn-add-cart" data-product="Executive Gold" data-price="210.00"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product 5 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-5">
+                                <div class="heart-icon"><i class="fa-regular fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop" alt="Blue Shield Pro"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Blue Shield Pro</h5><span class="price">$159.00</span></div>
+                                    <p class="product-desc">Integrated blue-light protection technology for screen use.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#6B8EA5;" title="Steel Blue"></span><span class="color-swatch" style="background:#1a1a2e;" title="Black"></span></div>
+                                    <button class="btn-add-cart" data-product="Blue Shield Pro" data-price="159.00"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Product 6 -->
+                        <div class="col-md-6 col-xl-4">
+                            <div class="product-card" id="product-6">
+                                <div class="heart-icon"><i class="fa-regular fa-heart"></i></div>
+                                <div class="product-img-wrapper"><img src="https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=400&h=300&fit=crop" alt="Urban Aviator"></div>
+                                <div class="product-info">
+                                    <div class="product-title-row"><h5>Urban Aviator</h5><span class="price">$175.00</span></div>
+                                    <p class="product-desc">Classic silhouette with medical-grade steel construction.</p>
+                                    <div class="color-swatches"><span class="color-swatch active" style="background:#B8860B;" title="Gold"></span><span class="color-swatch" style="background:#555;" title="Gunmetal"></span></div>
+                                    <button class="btn-add-cart" data-product="Urban Aviator" data-price="175.00"><i class="fa-solid fa-cart-shopping"></i> Add to Cart</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div class="pagination-wrapper">
+                        <nav aria-label="Products pagination">
+                            <ul class="pagination mb-0" id="pagination">
+                                <li class="page-item"><a class="page-link" href="#" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></a></li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item disabled"><a class="page-link" href="#">…</a></li>
+                                <li class="page-item"><a class="page-link" href="#">12</a></li>
+                                <li class="page-item"><a class="page-link" href="#" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer-section" id="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-logo"><span class="logo-icon"><i class="fa-solid fa-glasses"></i></span> Basirah</div>
+                    <p class="footer-desc">Premium wholesale optical supplies for independent practices and retail brands worldwide.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">Use Cases</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Retail Boutiques</a></li>
+                        <li><a href="#">Optical Clinics</a></li>
+                        <li><a href="#">Healthcare Providers</a></li>
+                        <li><a href="#">Bulk Orders</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">Explore</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Style Finder</a></li>
+                        <li><a href="#">New Arrivals</a></li>
+                        <li><a href="#">Sustainable Line</a></li>
+                        <li><a href="#">Designer Lab</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="footer-heading">Resources</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Shipping Policy</a></li>
+                        <li><a href="#">Partner Program</a></li>
+                        <li><a href="#">Fit Guide</a></li>
+                        <li><a href="#">Contact Support</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6"><p>&copy; 2024 Basirah. Optical Supplies. All rights reserved.</p></div>
+                    <div class="col-md-6">
+                        <div class="footer-bottom-links">
+                            <a href="#">Privacy Policy</a>
+                            <a href="#">Terms of Service</a>
+                            <a href="#">Cookie Settings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+    $(document).ready(function () {
+
+        // Navbar scroll effect
+        $(window).on('scroll', function () {
+            $('#mainNavbar').toggleClass('scrolled', $(this).scrollTop() > 50);
+        });
+
+        // Face shape card click
+        $('.face-card').on('click', function () {
+            $('.face-card').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Heart / wishlist toggle
+        $('.heart-icon').on('click', function () {
+            var $icon = $(this).find('i');
+            $(this).toggleClass('active');
+            if ($(this).hasClass('active')) {
+                $icon.removeClass('fa-regular').addClass('fa-solid');
+            } else {
+                $icon.removeClass('fa-solid').addClass('fa-regular');
+            }
+        });
+
+        // Product card hover effects (jQuery)
+        $('.product-card').on('mouseenter', function () {
+            $(this).css('box-shadow', '0 12px 40px rgba(29,53,87,0.15)');
+            $(this).find('.btn-add-cart').css({ 'background': '#274b78', 'transform': 'scale(1.02)' });
+        }).on('mouseleave', function () {
+            $(this).css('box-shadow', '');
+            $(this).find('.btn-add-cart').css({ 'background': '', 'transform': '' });
+        });
+
+        // Add to cart click
+        $('.btn-add-cart').on('click', function (e) {
+            e.preventDefault();
+            var $btn = $(this);
+            var name = $btn.data('product');
+            var price = $btn.data('price');
+            var orig = $btn.html();
+            $btn.html('<i class="fa-solid fa-check"></i> Added!').css({ 'background': '#198754', 'color': '#fff' });
+            setTimeout(function () { $btn.html(orig).css({ 'background': '', 'color': '' }); }, 1500);
+        });
+
+        // Color swatch click
+        $('.color-swatches').on('click', '.color-swatch', function () {
+            $(this).closest('.color-swatches').find('.color-swatch').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Shape button click
+        $('.shape-btn').on('click', function () {
+            $('.shape-btn').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Mobile filter toggle
+        $('#filter-toggle').on('click', function () {
+            var $sidebar = $('#filters-sidebar');
+            $sidebar.toggleClass('show');
+            $(this).html($sidebar.hasClass('show') ? '<i class="fa-solid fa-xmark"></i> Hide Filters' : '<i class="fa-solid fa-sliders"></i> Show Filters');
+        });
+
+        // Price slider
+        $('#price-range-slider').on('input', function () {
+            var val = $(this).val();
+            $('#price-max').text(val >= 500 ? '$500+' : '$' + val);
+        });
+
+        // Pagination click
+        $('.pagination .page-link').on('click', function (e) {
+            e.preventDefault();
+            if (!$(this).parent().hasClass('disabled')) {
+                $('.pagination .page-item').removeClass('active');
+                $(this).parent().addClass('active');
+            }
+        });
+
+        // Scroll reveal animation
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    $(entry.target).addClass('animate-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        $('.product-card, .face-card').each(function () {
+            this.style.opacity = '0';
+            observer.observe(this);
+        });
+    });
+    </script>
+
+</body>
+</html>
