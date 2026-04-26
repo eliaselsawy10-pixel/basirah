@@ -261,7 +261,7 @@
 
         <div class="divider"></div>
 
-        <h2>Story Behind the Name</h2>
+        <h2>Storyyyyyyyyyyyyyyyyyy Behind the Name</h2>
         <p>The name "Basirah" originates from the Arabic word for "insight" and "deep perception." It represents clarity
             that goes beyond the physical act of seeing. We chose this name because it captures our ultimate mission: to
             provide you with the visual acuity and aesthetic confidence to navigate your life with profound insight. It is a
