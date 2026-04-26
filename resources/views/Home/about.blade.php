@@ -269,7 +269,7 @@
 
         <div class="divider"></div>
 
-        <h2>Why We Do What We Do</h2>
+        <h2>Why We Do What We Dooooooooooooooooooooooooooooooooooooooooo</h2>
         <p>We do what we do because eyewear is uniquely personal. It sits at the center of your face, frames your
             expressions, and becomes part of your identity. Over the years, we recognized a gap in the market for eyewear
             that seamlessly balances high-end medical function with sophisticated, timeless aesthetics. We are driven by the
