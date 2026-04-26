@@ -253,7 +253,7 @@
 
         <h1>About Basirah</h1>
 
-        <h2>Eithernet</h2>
+        <h2>Eithernetoooooooooooooooooooooooooooooooooooo</h2>
         <p>At Basirah, we believe that clear vision is the foundation of a life well-lived. Our philosophy is rooted in the
             intersection of premium quality and modern elegance. We design and curate eyewear that not only enhances how you
             see the world, but ultimately transforms how the world sees you. True luxury should be effortless, functional,
