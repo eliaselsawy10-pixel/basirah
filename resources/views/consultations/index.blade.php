@@ -104,13 +104,13 @@
     .navbar-brand-logo .logo-icon {
         width: 32px;
         height: 32px;
-        background: var(--primary);
+        background: #BDE3F9;
         border-radius: var(--radius-sm);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
-        color: var(--dark);
+        color: #1D3557;
     }
 
     .navbar-basirah .nav-link {

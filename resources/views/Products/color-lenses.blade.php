@@ -92,13 +92,13 @@
         .navbar-brand-logo .logo-icon {
             width: 36px;
             height: 36px;
-            background: #1D3557;
+            background: #BDE3F9;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
-            color: #fff;
+            color: #1D3557;
         }
 
         .navbar-basirah .nav-link {
