@@ -448,7 +448,7 @@
             appearance: none;
             width: 16px;
             height: 16px;
-            background: var(--accent);
+            background: #1d3557;
             border-radius: 50%;
             cursor: pointer;
             pointer-events: all;
@@ -473,7 +473,7 @@
             position: absolute;
             top: 14px;
             height: 4px;
-            background: var(--accent);
+            background: #1d3557;
             border-radius: 4px;
             z-index: 1;
         }
