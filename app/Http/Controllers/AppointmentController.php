@@ -57,7 +57,11 @@ class AppointmentController extends Controller
     }
 
     /**
-     * AJAX — Book an appointment.
+     * AJAX — Reserve an appointment slot (store in session, don't create yet).
+     *
+     * The appointment is NOT created in the database here. Instead, the booking
+     * data is saved in the session and the user is redirected to the appointment
+     * checkout page to complete payment before the appointment is confirmed.
      *
      * POST /appointments
      */
@@ -86,8 +90,77 @@ class AppointmentController extends Controller
             ], 409);
         }
 
-        // ── Resolve price from doctor (user) ─────────────────────────
+        // ── Resolve doctor info ──────────────────────────────────────
         $doctor = User::where('id', $validated['doctor_id'])->where('role', 'doctor')->firstOrFail();
+
+        // ── Store booking data in session (not in DB yet) ────────────
+        session()->put('appointment_booking', [
+            'doctor_id' => $doctor->id,
+            'doctor_name' => $doctor->name,
+            'doctor_image' => $doctor->image,
+            'doctor_title' => $doctor->title,
+            'appointment_date' => $validated['appointment_date'],
+            'time_slot' => $validated['time_slot'],
+            'patient_name' => $validated['patient_name'],
+            'patient_email' => $validated['patient_email'],
+            'patient_phone' => $validated['patient_phone'] ?? null,
+            'price' => $doctor->price,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Redirecting to payment...',
+            'redirect' => route('appointments.checkout'),
+        ], 200);
+    }
+
+    /**
+     * Show the appointment checkout/payment page.
+     *
+     * GET /appointments/checkout
+     */
+    public function checkout()
+    {
+        $booking = session('appointment_booking');
+
+        if (!$booking) {
+            return redirect()->route('appointments.index')
+                ->with('error', 'No appointment booking found. Please select a doctor and time slot.');
+        }
+
+        return view('consultations.appointment-checkout', compact('booking'));
+    }
+
+    /**
+     * Process the appointment payment and create the appointment.
+     *
+     * POST /appointments/checkout
+     */
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:credit_card,digital_wallets',
+        ]);
+
+        $booking = session('appointment_booking');
+
+        if (!$booking) {
+            return redirect()->route('appointments.index')
+                ->with('error', 'No appointment booking found. Please try again.');
+        }
+
+        // ── Double-check the slot is STILL free ──────────────────────
+        $alreadyTaken = Appointment::where('doctor_id', $booking['doctor_id'])
+            ->where('appointment_date', $booking['appointment_date'])
+            ->where('time_slot', $booking['time_slot'])
+            ->where('status', '!=', 'cancelled')
+            ->exists();
+
+        if ($alreadyTaken) {
+            session()->forget('appointment_booking');
+            return redirect()->route('appointments.index')
+                ->with('error', 'Sorry, that time slot has just been taken by someone else. Please choose another.');
+        }
 
         // ── Generate meeting token & URL ─────────────────────────────
         $meetingToken = Str::random(32);
@@ -96,31 +169,25 @@ class AppointmentController extends Controller
         // ── Create the appointment ───────────────────────────────────
         $appointment = Appointment::create([
             'user_id' => auth()->id(),
-            'doctor_id' => $doctor->id,
-            'patient_name' => $validated['patient_name'],
-            'patient_email' => $validated['patient_email'],
-            'patient_phone' => $validated['patient_phone'] ?? null,
-            'appointment_date' => $validated['appointment_date'],
-            'appointment_time' => $this->slotToTime($validated['time_slot']),
-            'time_slot' => $validated['time_slot'],
-            'price_paid' => $doctor->price,
-            'status' => 'pending',
+            'doctor_id' => $booking['doctor_id'],
+            'patient_name' => $booking['patient_name'],
+            'patient_email' => $booking['patient_email'],
+            'patient_phone' => $booking['patient_phone'],
+            'appointment_date' => $booking['appointment_date'],
+            'appointment_time' => $this->slotToTime($booking['time_slot']),
+            'time_slot' => $booking['time_slot'],
+            'price_paid' => $booking['price'],
+            'status' => 'confirmed',
             'meeting_token' => $meetingToken,
             'meeting_url' => $meetingUrl,
         ]);
 
-        // ── Store patient email in session for guest lookup ──────────
-        $bookedEmails = session('booked_emails', []);
-        if (!in_array($validated['patient_email'], $bookedEmails)) {
-            $bookedEmails[] = $validated['patient_email'];
-            session(['booked_emails' => $bookedEmails]);
-        }
+        // ── Clear booking session ────────────────────────────────────
+        session()->forget('appointment_booking');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Appointment booked successfully!',
-            'appointment' => $appointment->only('id', 'appointment_date', 'time_slot', 'price_paid', 'status', 'meeting_url'),
-        ], 201);
+        // ── Redirect with success ────────────────────────────────────
+        return redirect()->route('appointments.my')
+            ->with('success', 'Payment successful! Your appointment #' . $appointment->id . ' has been confirmed.');
     }
 
     /**
@@ -128,20 +195,11 @@ class AppointmentController extends Controller
      */
     public function myAppointments(Request $request)
     {
-        $query = Appointment::with('doctor')->orderBy('appointment_date', 'desc')->orderBy('appointment_time', 'desc');
-
-        if (auth()->check()) {
-            $query->where('user_id', auth()->id());
-        } else {
-            $bookedEmails = session('booked_emails', []);
-            if (empty($bookedEmails)) {
-                $appointments = collect();
-                return view('consultations.my-appointments', compact('appointments'));
-            }
-            $query->whereIn('patient_email', $bookedEmails);
-        }
-
-        $appointments = $query->get();
+        $appointments = Appointment::with('doctor')
+            ->where('user_id', auth()->id())
+            ->orderBy('appointment_date', 'desc')
+            ->orderBy('appointment_time', 'desc')
+            ->get();
 
         return view('consultations.my-appointments', compact('appointments'));
     }

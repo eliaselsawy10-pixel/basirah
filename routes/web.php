@@ -37,12 +37,9 @@ Route::get('/products/{id}', [ProductsController::class, 'show'])->name('product
 Route::get('/select-lenses/{id}', [LensController::class, 'selectLenses'])->name('lenses.select');
 Route::post('/select-lenses/proceed', [LensController::class, 'proceedToCheckout'])->name('lenses.proceed');
 
-// Consultation / Appointment Routes
+// Consultation / Appointment Routes (public — browse doctors & check slots)
 Route::get('/consultations', [AppointmentController::class, 'index'])->name('appointments.index');
 Route::get('/appointments/slots', [AppointmentController::class, 'availableSlots'])->name('appointments.slots');
-Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-Route::get('/my-appointments', [AppointmentController::class, 'myAppointments'])->name('appointments.my');
-Route::get('/consultation/join/{token}', [AppointmentController::class, 'joinMeeting'])->name('consultation.join');
 
 // Doctor Dashboard (requires auth — checked inside controller)
 Route::get('/doctor/dashboard', [AppointmentController::class, 'doctorDashboard'])->name('doctor.dashboard')->middleware('auth');
@@ -60,6 +57,13 @@ Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
+    // Appointment Routes (requires auth — book, pay, view)
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    Route::get('/appointments/checkout', [AppointmentController::class, 'checkout'])->name('appointments.checkout');
+    Route::post('/appointments/checkout', [AppointmentController::class, 'processCheckout'])->name('appointments.processCheckout');
+    Route::get('/my-appointments', [AppointmentController::class, 'myAppointments'])->name('appointments.my');
+    Route::get('/consultation/join/{token}', [AppointmentController::class, 'joinMeeting'])->name('consultation.join');
+
     // Prescription Routes (requires auth for anti-duplicate user_id logic)
     Route::get('/prescription/create', [PrescriptionController::class, 'create'])->name('prescription.create');
     Route::post('/prescription/ocr', [PrescriptionController::class, 'ocr'])->name('prescription.ocr');

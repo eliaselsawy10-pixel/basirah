@@ -1383,6 +1383,32 @@
         $(document).ready(function () {
 
             // ========================================
+            // AUTH STATE (injected by Blade)
+            // ========================================
+            var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+            var loginUrl = '{{ route("login") }}';
+            var registerUrl = '{{ route("register") }}';
+
+            function requireAuth(actionLabel) {
+                if (isAuthenticated) return true;
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sign In Required',
+                    text: 'You need to sign in to ' + actionLabel + '.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sign In',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#1D3557',
+                    footer: 'Don\'t have an account? <a href="' + registerUrl + '">Create an account</a>'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        window.location.href = loginUrl + '?redirect=' + encodeURIComponent(window.location.href);
+                    }
+                });
+                return false;
+            }
+
+            // ========================================
             // STATE
             // ========================================
             var selectedDoctorId = null;
@@ -1615,6 +1641,9 @@
             // SELECT SLOT BUTTON (Doctor Cards)
             // ========================================
             $('.btn-select-slot').on('click', function () {
+                // ── Auth gate ──
+                if (!requireAuth('book a consultation')) return;
+
                 selectedDoctorId = $(this).data('doctor-id');
                 selectedDoctorName = $(this).data('doctor');
                 selectedDoctorPrice = parseFloat($(this).data('price'));
@@ -1648,6 +1677,9 @@
             // BOOK APPOINTMENT BUTTON → OPEN MODAL
             // ========================================
             $('#bookAppointmentBtn').on('click', function () {
+                // ── Auth gate ──
+                if (!requireAuth('book a consultation')) return;
+
                 // Validate selections
                 if (!selectedDoctorId) {
                     Swal.fire({
@@ -1739,31 +1771,10 @@
                         $btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Confirm Booking');
                         $('#bookingForm')[0].reset();
 
-                        // Show success
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Appointment Booked!',
-                            html: '<p style="margin-bottom:8px">Your consultation has been scheduled.</p>' +
-                                  '<p style="font-size:0.85rem;color:#555">' +
-                                  '<strong>Doctor:</strong> ' + selectedDoctorName + '<br>' +
-                                  '<strong>Date:</strong> ' + monthAbbr[currentMonth] + ' ' + selectedDay + ', ' + currentYear + '<br>' +
-                                  '<strong>Time:</strong> ' + selectedTimeSlot + '<br>' +
-                                  '<strong>Fee:</strong> $' + selectedDoctorPrice.toFixed(2) +
-                                  '</p>' +
-                                  '<p style="font-size:0.82rem;color:#888;margin-top:10px">A meeting link will appear on your appointments page when it\'s time.</p>',
-                            confirmButtonText: 'View My Appointments',
-                            showCancelButton: true,
-                            cancelButtonText: 'Stay Here',
-                            confirmButtonColor: '#007BFF'
-                        }).then(function (result) {
-                            if (result.isConfirmed) {
-                                window.location.href = '{{ route("appointments.my") }}';
-                            }
-                        });
-
-                        // Refresh slots to remove the booked one
-                        fetchSlots();
-                        selectedTimeSlot = null;
+                        // Redirect to the appointment checkout page for payment
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        }
                     },
                     error: function (xhr) {
                         $btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Confirm Booking');
