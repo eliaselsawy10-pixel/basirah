@@ -95,15 +95,15 @@
                     </div>
 
                     {{-- ═══════════════════════════════════════════════
-                    PRODUCT IMAGES (Main + 2 Sub-Photos)
+                    PRODUCT IMAGES (Main Photo + Sub Photo)
                     ═══════════════════════════════════════════════ --}}
                     <h5 class="mb-3"
                         style="font-weight:700; color:#1D3557; border-bottom:2px solid #e2e8f0; padding-bottom:10px;">
                         <i class="fas fa-images me-2"></i>Product Images
                     </h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="admin-label">Main Photo</label>
+                        <div class="col-md-6">
+                            <label class="admin-label">Main Photo <small class="text-muted">(Color 1 — front view)</small></label>
                             <input type="file" name="image" class="admin-input" accept="image/*">
                             @if($product && $product->image)
                                 <div class="mt-2">
@@ -112,22 +112,12 @@
                                 </div>
                             @endif
                         </div>
-                        <div class="col-md-4 frame-only-field">
-                            <label class="admin-label">Sub Photo 1</label>
+                        <div class="col-md-6 frame-only-field">
+                            <label class="admin-label">Sub Photo <small class="text-muted">(Same color, different angle)</small></label>
                             <input type="file" name="sub_image_1" class="admin-input" accept="image/*">
                             @if($product && $product->images->count() > 0)
                                 <div class="mt-2">
-                                    <img src="{{ asset($product->images[0]->image_path) }}" alt="Sub 1"
-                                        style="width:80px;height:80px;object-fit:contain;border:1px solid #e2e8f0;border-radius:8px;padding:4px;">
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-4 frame-only-field">
-                            <label class="admin-label">Sub Photo 2</label>
-                            <input type="file" name="sub_image_2" class="admin-input" accept="image/*">
-                            @if($product && $product->images->count() > 1)
-                                <div class="mt-2">
-                                    <img src="{{ asset($product->images[1]->image_path) }}" alt="Sub 2"
+                                    <img src="{{ asset($product->images[0]->image_path) }}" alt="Sub"
                                         style="width:80px;height:80px;object-fit:contain;border:1px solid #e2e8f0;border-radius:8px;padding:4px;">
                                 </div>
                             @endif
@@ -170,13 +160,32 @@
                                         <input type="text" name="frame_color_names[]" class="admin-input mb-2"
                                             placeholder="e.g. Black" value="{{ $colors[$i]['name'] ?? '' }}">
                                         <label class="admin-label" style="font-size:0.75rem;">Hex Code</label>
-                                        <div class="d-flex align-items-center gap-2">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
                                             <input type="color" name="frame_color_hexes[]"
                                                 value="{{ $colors[$i]['hex'] ?? '#000000' }}"
                                                 style="width:42px;height:38px;border:1px solid #ddd;border-radius:6px;padding:2px;cursor:pointer;">
                                             <input type="text" class="admin-input hex-text-input"
                                                 value="{{ $colors[$i]['hex'] ?? '#000000' }}" style="flex:1;" readonly>
                                         </div>
+
+                                        @if($i === 0)
+                                            {{-- Color 1 auto-uses the Main Photo --}}
+                                            <div class="d-flex align-items-center gap-2 mt-1 px-1" style="background:#eef5fb; border-radius:6px; padding:8px;">
+                                                <i class="fas fa-link" style="color:#1D3557; font-size:0.7rem;"></i>
+                                                <small style="color:#1D3557; font-weight:600; font-size:0.72rem;">Image: Uses Main Photo automatically</small>
+                                            </div>
+                                        @else
+                                            {{-- Colors 2 & 3 get their own image upload --}}
+                                            <label class="admin-label" style="font-size:0.75rem;">Color Image</label>
+                                            <input type="file" name="frame_color_images[{{ $i }}]" class="admin-input mb-1" accept="image/*">
+                                            <input type="hidden" name="frame_color_existing_images[{{ $i }}]" value="{{ $colors[$i]['image'] ?? '' }}">
+                                            @if(!empty($colors[$i]['image']))
+                                                <div class="mt-1">
+                                                    <img src="{{ asset($colors[$i]['image']) }}" alt="Color {{ $i + 1 }}"
+                                                        style="width:60px;height:60px;object-fit:contain;border:1px solid #e2e8f0;border-radius:6px;padding:2px;">
+                                                </div>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             @endfor

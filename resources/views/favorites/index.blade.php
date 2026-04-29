@@ -825,20 +825,22 @@
 
             <!-- Favorites Items -->
             <div id="favItemsContainer">
-                @forelse($favorites as $id => $item)
-                    <div class="fav-item animate-in delay-{{ $loop->iteration }}" id="favItem-{{ $id }}" data-id="{{ $id }}">
+                @forelse($favorites as $id => $fav)
+                    @php $item = $fav->product; @endphp
+                    @if($item)
+                    <div class="fav-item animate-in delay-{{ $loop->iteration }}" id="favItem-{{ $item->id }}" data-id="{{ $item->id }}">
                         <!-- Product Image -->
                         <div class="fav-item-image">
-                            <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}">
+                            <img src="{{ asset($item->image) }}" alt="{{ $item->name }}">
                         </div>
 
                         <!-- Product Info -->
                         <div class="fav-item-info">
-                            <div class="fav-item-name">{{ $item['name'] }}</div>
-                            <div class="fav-item-category">{{ $item['category'] }}</div>
+                            <div class="fav-item-name">{{ $item->name }}</div>
+                            <div class="fav-item-category">{{ $item->category }}</div>
                             <div class="fav-item-meta">
-                                <span class="fav-item-price">${{ number_format($item['price'], 2) }}</span>
-                                @if($item['inStock'])
+                                <span class="fav-item-price">${{ number_format($item->price, 2) }}</span>
+                                @if($item->stock > 0)
                                     <span class="stock-badge in-stock">
                                         <span class="stock-dot"></span> In Stock
                                     </span>
@@ -852,18 +854,19 @@
 
                         <!-- Action Buttons -->
                         <div class="fav-item-actions">
-                            <button type="button" class="btn-add-to-cart {{ !$item['inStock'] ? 'disabled' : '' }}"
-                                data-id="{{ $id }}" id="addToCart-{{ $id }}" {{ !$item['inStock'] ? 'disabled' : '' }}
+                            <button type="button" class="btn-add-to-cart {{ $item->stock < 1 ? 'disabled' : '' }}"
+                                data-id="{{ $item->id }}" id="addToCart-{{ $item->id }}" {{ $item->stock < 1 ? 'disabled' : '' }}
                                 aria-label="Add to Cart">
                                 <i class="fa-solid fa-cart-plus"></i>
-                                <span>{{ $item['inStock'] ? 'Add to Cart' : 'Unavailable' }}</span>
+                                <span>{{ $item->stock > 0 ? 'Add to Cart' : 'Unavailable' }}</span>
                             </button>
-                            <button type="button" class="btn-remove-fav" data-id="{{ $id }}" id="removeFav-{{ $id }}"
+                            <button type="button" class="btn-remove-fav" data-id="{{ $item->id }}" id="removeFav-{{ $item->id }}"
                                 aria-label="Remove from favorites">
                                 <i class="fa-regular fa-trash-can"></i>
                             </button>
                         </div>
                     </div>
+                    @endif
                 @empty
                     <div class="empty-favorites animate-in" id="emptyFavMsg">
                         <div class="empty-fav-icon">

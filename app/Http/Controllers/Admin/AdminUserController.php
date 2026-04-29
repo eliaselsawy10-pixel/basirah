@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminUserController extends Controller
 {
@@ -63,7 +64,7 @@ class AdminUserController extends Controller
         $imagePath = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = 'doctor-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'doctor-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('images'), $filename);
             $imagePath = 'images/' . $filename;
         }
@@ -146,7 +147,7 @@ class AdminUserController extends Controller
             // Handle image upload
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = 'doctor-' . time() . '.' . $file->getClientOriginalExtension();
+                $filename = 'doctor-' . Str::uuid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images'), $filename);
                 $data['image'] = 'images/' . $filename;
             }
@@ -173,7 +174,7 @@ class AdminUserController extends Controller
     }
 
     /**
-     * Delete user.
+     * Delete user and cascade cleanup related data.
      */
     public function destroy($id)
     {
@@ -182,6 +183,20 @@ class AdminUserController extends Controller
         // Prevent deleting yourself
         if ($user->id === auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You cannot delete your own account.'], 403);
+        }
+
+        // Cascade cleanup related data to prevent orphaned records
+        $user->reviews()->delete();
+        $user->prescriptions()->delete();
+        $user->appointments()->delete();
+        \App\Models\Favorite::where('user_id', $user->id)->delete();
+
+        // Nullify user_id on orders (keep order history for accounting)
+        $user->orders()->update(['user_id' => null]);
+
+        // If doctor, also clean doctor appointments
+        if ($user->isDoctor()) {
+            $user->doctorAppointments()->update(['doctor_id' => null]);
         }
 
         $user->delete();

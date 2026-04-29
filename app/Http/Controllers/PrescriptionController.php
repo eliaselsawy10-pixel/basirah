@@ -23,7 +23,7 @@ class PrescriptionController extends Controller
         if ($request->has('product_id')) {
             $product = \App\Models\Product::find($request->product_id);
             if ($product) {
-                $isContact = stripos($product->category, 'contact') !== false || stripos($product->name, 'contact') !== false || stripos($product->category, 'color') !== false || stripos($product->name, 'lens') !== false;
+                $isContact = $product->is_contact_lens;
             }
         }
 
@@ -137,14 +137,18 @@ class PrescriptionController extends Controller
         $cleaned = preg_replace('/([+-])\s+(\d)/', '$1$2', ltrim($text));
         $cleaned = str_replace(',', '.', $cleaned);
 
-        // Standardizing OCR common mistakes
-        $replacements = [
-            '-' => '-',
-            'O' => '0',
-            'o' => '0',
-            'S' => '5',
-        ];
-        $cleaned = strtr($cleaned, $replacements);
+        // Fix common OCR dash misreads
+        $cleaned = str_replace('–', '-', $cleaned);
+
+        // Fix OCR digit misreads only in numeric contexts
+        // (don't replace globally — that corrupts labels like SPH, OD, OS)
+        $cleaned = preg_replace_callback(
+            '/(?<=[+-]|\b)([0-9OSo]+\.?[0-9OSo]*)(?=\s|$|[^a-zA-Z])/',
+            function ($m) {
+                return strtr($m[0], ['O' => '0', 'o' => '0', 'S' => '5']);
+            },
+            $cleaned
+        );
 
         $data = [
             'right' => ['sph' => null, 'cyl' => null, 'axis' => null],
@@ -259,22 +263,16 @@ class PrescriptionController extends Controller
 
         // ── 5. Redirect based on type ─────────────────────────────
         if ($isContact) {
-            // Add the contact lens product to the cart for checkout display
+            // Direct checkout for contact lenses — skip the cart entirely
             $product = \App\Models\Product::find($request->product_id);
             if ($product) {
-                $cart = session()->get('cart', []);
-                if (isset($cart[$product->id])) {
-                    $cart[$product->id]['quantity']++;
-                } else {
-                    $cart[$product->id] = [
-                        'name'        => $product->name,
-                        'description' => $product->description ?? '',
-                        'price'       => $product->price,
-                        'quantity'    => 1,
-                        'image'       => $product->image,
-                    ];
-                }
-                session()->put('cart', $cart);
+                session()->put('contact_lens_order', [
+                    'product_id'      => $product->id,
+                    'product_name'    => $product->name,
+                    'product_image'   => $product->image,
+                    'price'           => $product->price,
+                    'prescription_id' => $prescription->id,
+                ]);
             }
             return redirect()->route('checkout.index')->with('success', 'Prescription attached!');
         }

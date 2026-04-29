@@ -68,7 +68,7 @@
             {{-- Favourites Icon --}}
             <a href="{{ route('favorites.index') }}" class="btn-nav-icon" id="navFavBtn" aria-label="Favorites" @guest onclick="event.preventDefault(); showAuthAlert();" @endguest>
                 <i class="fa-regular fa-heart"></i>
-                @php $favCount = count(session('favorites', [])); @endphp
+                @php $favCount = auth()->check() ? \App\Models\Favorite::where('user_id', auth()->id())->count() : 0; @endphp
                 <span class="nav-badge" id="navFavBadge" @if($favCount < 1) style="display:none" @endif>{{ $favCount }}</span>
             </a>
 
@@ -102,6 +102,11 @@
                     <li>
                         <a class="dropdown-item" href="{{ route('settings.index') }}" id="dropdown-settings">
                             <i class="fa-solid fa-gear me-2"></i> User Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('orders.index') }}" id="dropdown-orders">
+                            <i class="fa-solid fa-receipt me-2"></i> My Orders
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>

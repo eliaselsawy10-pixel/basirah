@@ -43,13 +43,8 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Auth::login($user);
-
-        // return redirect()->intended('/');
-        
-        // Return back to prevent actual database write for now if db is not setup,
-        // or uncomment Above when ready. Assuming User model exists and db is configured.
         Auth::login($user);
+
         return redirect()->intended('/');
     }
 }

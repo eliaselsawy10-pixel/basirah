@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminProductController extends Controller
 {
@@ -62,13 +63,12 @@ class AdminProductController extends Controller
             'color_family'   => 'nullable|string|max:100',
             'replacement'    => 'nullable|string|max:100',
             'sub_image_1'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'sub_image_2'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         // Handle main image upload
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('images/products'), $filename);
             $validated['image'] = 'images/products/' . $filename;
         }
@@ -82,6 +82,9 @@ class AdminProductController extends Controller
         $validated['frame_sizes']     = $this->parseFrameSizes($request);
 
         $product = Product::create($validated);
+
+        // Auto-set Color 1 image to the main product image
+        $this->syncColor1Image($product);
 
         // Handle sub-image uploads → product_images table
         $this->handleSubImages($request, $product);
@@ -121,13 +124,12 @@ class AdminProductController extends Controller
             'color_family'   => 'nullable|string|max:100',
             'replacement'    => 'nullable|string|max:100',
             'sub_image_1'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'sub_image_2'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         // Handle main image upload
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('images/products'), $filename);
             $validated['image'] = 'images/products/' . $filename;
         }
@@ -141,6 +143,9 @@ class AdminProductController extends Controller
         $validated['frame_sizes']     = $this->parseFrameSizes($request);
 
         $product->update($validated);
+
+        // Auto-set Color 1 image to the main product image
+        $this->syncColor1Image($product);
 
         // Handle sub-image uploads → product_images table
         $this->handleSubImages($request, $product);
@@ -178,20 +183,37 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Parse 3 color name + hex pairs into a JSON-ready array.
+     * Parse 3 color name + hex pairs (with optional per-color images) into a JSON-ready array.
      */
     private function parseFrameColors(Request $request): ?array
     {
-        $names = $request->input('frame_color_names', []);
-        $hexes = $request->input('frame_color_hexes', []);
-        $colors = [];
+        $names          = $request->input('frame_color_names', []);
+        $hexes          = $request->input('frame_color_hexes', []);
+        $existingImages = $request->input('frame_color_existing_images', []);
+        $colors         = [];
 
         foreach ($names as $i => $name) {
             $name = trim($name);
             $hex  = trim($hexes[$i] ?? '#000000');
-            if (!empty($name)) {
-                $colors[] = ['name' => $name, 'hex' => $hex];
+            if (empty($name)) {
+                continue;
             }
+
+            $imagePath = $existingImages[$i] ?? '';
+
+            // Upload new color image if provided
+            if ($request->hasFile("frame_color_images.$i")) {
+                $file      = $request->file("frame_color_images.$i");
+                $filename = Str::uuid() . '_color' . ($i + 1) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images/products'), $filename);
+                $imagePath = 'images/products/' . $filename;
+            }
+
+            $colors[] = [
+                'name'  => $name,
+                'hex'   => $hex,
+                'image' => $imagePath ?: '',
+            ];
         }
 
         return !empty($colors) ? $colors : null;
@@ -218,31 +240,37 @@ class AdminProductController extends Controller
     }
 
     /**
-     * Upload sub-images and save/replace in product_images table.
-     * Each product should have exactly 2 sub-images.
+     * Upload the sub-image (same color, different angle) into product_images table.
      */
     private function handleSubImages(Request $request, Product $product): void
     {
-        $existingImages = $product->images()->orderBy('id')->get();
+        if ($request->hasFile('sub_image_1')) {
+            $file     = $request->file('sub_image_1');
+            $filename = Str::uuid() . '_sub.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/products'), $filename);
+            $path = 'images/products/' . $filename;
 
-        foreach (['sub_image_1', 'sub_image_2'] as $index => $field) {
-            if ($request->hasFile($field)) {
-                $file     = $request->file($field);
-                $filename = time() . '_sub' . ($index + 1) . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/products'), $filename);
-                $path = 'images/products/' . $filename;
-
-                if (isset($existingImages[$index])) {
-                    // Replace existing sub-image
-                    $existingImages[$index]->update(['image_path' => $path]);
-                } else {
-                    // Create new sub-image
-                    ProductImage::create([
-                        'product_id' => $product->id,
-                        'image_path' => $path,
-                    ]);
-                }
+            $existing = $product->images()->orderBy('id')->first();
+            if ($existing) {
+                $existing->update(['image_path' => $path]);
+            } else {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                ]);
             }
+        }
+    }
+
+    /**
+     * Auto-set Color 1's image to the main product image path.
+     */
+    private function syncColor1Image(Product $product): void
+    {
+        $colors = $product->frame_colors;
+        if (!empty($colors) && isset($colors[0])) {
+            $colors[0]['image'] = $product->image ?? '';
+            $product->update(['frame_colors' => $colors]);
         }
     }
 }

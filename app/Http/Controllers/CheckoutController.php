@@ -22,11 +22,12 @@ class CheckoutController extends Controller
     {
         $orderItems  = [];
         $subtotal    = 0;
-        $taxRate     = 0.08;
+        $taxRate     = config('shop.tax_rate', 0.08);
         $shipping    = 0; // Free shipping
-        $orderType   = 'cart';
-        $lensOrder   = session()->get('lens_order');
-        $cartItems   = session()->get('cart', []);
+        $orderType        = 'cart';
+        $lensOrder        = session()->get('lens_order');
+        $contactLensOrder = session()->get('contact_lens_order');
+        $cartItems        = session()->get('cart', []);
 
         // ── Frame-only direct checkout (from product detail page) ──
         if ($request->filled('frame_only')) {
@@ -55,6 +56,19 @@ class CheckoutController extends Controller
                 'frame_color'    => $request->input('frame_color', ''),
                 'frame_size'     => $request->input('frame_size', ''),
             ]);
+        } elseif ($contactLensOrder) {
+            // ── Contact lens direct order (no cart) ──
+            session()->forget(['frame_only_order', 'lens_order']);
+            $orderType = 'contact_lens';
+
+            $orderItems[] = [
+                'name'     => $contactLensOrder['product_name'] . ' (Contact Lens)',
+                'image'    => $contactLensOrder['product_image'],
+                'price'    => $contactLensOrder['price'],
+                'quantity' => 1,
+            ];
+
+            $subtotal = $contactLensOrder['price'];
         } elseif ($lensOrder) {
             // Clear any frame_only_order session to prevent conflicts
             session()->forget('frame_only_order');
@@ -117,7 +131,7 @@ class CheckoutController extends Controller
                 $subtotal += $item['price'] * $item['quantity'];
             }
         } else {
-            // ── Cart-based order (contact lenses, frame-only, etc.) ──
+            // ── Cart-based order (frame-only, etc.) ──
             foreach ($cartItems as $item) {
                 $orderItems[] = [
                     'name'     => $item['name'],
@@ -148,10 +162,12 @@ class CheckoutController extends Controller
      *
      * Post-Purchase Transition:
      * 1. Validate shipping & payment
-     * 2. Create Order + OrderItems in a DB transaction
-     * 3. Transition prescription status: 'submitted' → 'ordered'
-     * 4. Clear all session data (cart, lens_order, frame_only_order, prescription)
-     * 5. Redirect to confirmation
+     * 2. Validate stock availability
+     * 3. Create Order + OrderItems in a DB transaction
+     * 4. Decrement product stock
+     * 5. Transition prescription status: 'submitted' → 'ordered'
+     * 6. Clear all session data (cart, lens_order, frame_only_order, prescription)
+     * 7. Redirect to confirmation
      */
     public function process(Request $request)
     {
@@ -164,15 +180,17 @@ class CheckoutController extends Controller
             'payment_method' => 'required|in:credit_card,digital_wallets',
         ]);
 
-        $lensOrder      = session('lens_order');
-        $cartItems      = session('cart', []);
-        $frameOnlyOrder = session('frame_only_order');
+        $lensOrder        = session('lens_order');
+        $cartItems        = session('cart', []);
+        $frameOnlyOrder   = session('frame_only_order');
+        $contactLensOrder = session('contact_lens_order');
 
         // ── 2. Build order items & calculate totals ───────────────
-        $taxRate     = 0.08;
+        $taxRate     = config('shop.tax_rate', 0.08);
         $shipping    = 0;
         $subtotal    = 0;
         $dbItems     = []; // Items to insert into order_items table
+        $stockChecks = []; // [product_id => quantity] for stock validation
 
         if ($frameOnlyOrder) {
             // Frame-only order
@@ -188,16 +206,12 @@ class CheckoutController extends Controller
                 'quantity'       => 1,
                 'line_total'     => $frameOnlyOrder['price'],
             ];
+            $stockChecks[$frameOnlyOrder['product_id']] = 1;
         } elseif ($lensOrder) {
             // Eyeglasses order (frame + lenses)
             $lensPrice = ($lensOrder['lens_type_price'] ?? 0)
                        + ($lensOrder['lens_material_price'] ?? 0)
                        + ($lensOrder['enhancements_total'] ?? 0);
-
-            $lensTypeLabel = collect([
-                $lensOrder['lens_type'] ?? null,
-                $lensOrder['lens_material'] ?? null,
-            ])->filter()->implode(' + ');
 
             $dbItems[] = [
                 'product_id'      => $lensOrder['product_id'],
@@ -216,6 +230,7 @@ class CheckoutController extends Controller
                 'line_total'      => $lensOrder['subtotal'],
             ];
             $subtotal = $lensOrder['subtotal'];
+            $stockChecks[$lensOrder['product_id']] = 1;
 
             // Include any additional cart items (accessories, etc.)
             foreach ($cartItems as $cartKey => $item) {
@@ -234,9 +249,23 @@ class CheckoutController extends Controller
                     'line_total'     => $lineTotal,
                 ];
                 $subtotal += $lineTotal;
+                $stockChecks[$cartKey] = ($stockChecks[$cartKey] ?? 0) + $item['quantity'];
             }
+        } elseif ($contactLensOrder) {
+            // Contact lens direct order
+            $subtotal = $contactLensOrder['price'];
+            $dbItems[] = [
+                'product_id'      => $contactLensOrder['product_id'],
+                'product_name'    => $contactLensOrder['product_name'] . ' (Contact Lens)',
+                'product_price'   => $contactLensOrder['price'],
+                'purchase_type'   => 'contact_lens',
+                'prescription_id' => $contactLensOrder['prescription_id'] ?? null,
+                'quantity'        => 1,
+                'line_total'      => $contactLensOrder['price'],
+            ];
+            $stockChecks[$contactLensOrder['product_id']] = 1;
         } else {
-            // Cart-based order (contact lenses, etc.)
+            // Cart-based order
             foreach ($cartItems as $cartKey => $item) {
                 $lineTotal = $item['price'] * $item['quantity'];
                 $dbItems[] = [
@@ -251,14 +280,26 @@ class CheckoutController extends Controller
                     'line_total'     => $lineTotal,
                 ];
                 $subtotal += $lineTotal;
+                $stockChecks[$cartKey] = ($stockChecks[$cartKey] ?? 0) + $item['quantity'];
+            }
+        }
+
+        // ── 3. Validate stock availability ────────────────────────
+        foreach ($stockChecks as $productId => $requiredQty) {
+            $product = Product::find($productId);
+            if (!$product) {
+                return redirect()->back()->with('error', 'One of the products in your order is no longer available.');
+            }
+            if ($product->stock < $requiredQty) {
+                return redirect()->back()->with('error', "Sorry, \"{$product->name}\" only has {$product->stock} item(s) left in stock.");
             }
         }
 
         $tax   = round($subtotal * $taxRate, 2);
         $total = round($subtotal + $shipping + $tax, 2);
 
-        // ── 3. Create Order + OrderItems in a transaction ─────────
-        $order = DB::transaction(function () use ($validated, $subtotal, $shipping, $total, $dbItems) {
+        // ── 4. Create Order + OrderItems in a transaction ─────────
+        $order = DB::transaction(function () use ($validated, $subtotal, $shipping, $total, $dbItems, $stockChecks) {
             $order = Order::create([
                 'user_id'        => Auth::id(),
                 'full_name'      => $validated['full_name'],
@@ -276,22 +317,36 @@ class CheckoutController extends Controller
                 $order->items()->create($item);
             }
 
+            // ── 5. Decrement stock ────────────────────────────────
+            foreach ($stockChecks as $productId => $qty) {
+                Product::where('id', $productId)->decrement('stock', $qty);
+            }
+
             return $order;
         });
 
-        // ── 4. Post-Purchase Transition ───────────────────────────
+        // ── 6. Post-Purchase Transition ───────────────────────────
         // Change the user's 'submitted' prescription to 'ordered'
         // so it becomes permanent history and won't be overwritten.
-        if (Auth::check()) {
-            Prescription::where('user_id', Auth::id())
-                ->where('status', 'submitted')
-                ->update(['status' => 'ordered']);
-        }
+        Prescription::where('user_id', Auth::id())
+            ->where('status', 'submitted')
+            ->update(['status' => 'ordered']);
 
-        // ── 5. Clear all checkout session data ────────────────────
-        session()->forget(['cart', 'lens_order', 'frame_only_order', 'prescription']);
+        // ── 7. Clear all checkout session data ────────────────────
+        session()->forget(['cart', 'lens_order', 'frame_only_order', 'contact_lens_order', 'prescription']);
 
-        // ── 6. Redirect to confirmation ───────────────────────────
-        return redirect()->route('home')->with('success', 'Order placed successfully! Your order #' . $order->id . ' is being processed.');
+        // ── 8. Redirect to order confirmation ─────────────────────
+        return redirect()->route('checkout.confirmation', $order->id)
+            ->with('success', 'Order placed successfully! Your order #' . $order->id . ' is being processed.');
+    }
+
+    /**
+     * Display the order confirmation page.
+     */
+    public function confirmation($id)
+    {
+        $order = Order::with('items')->where('user_id', Auth::id())->findOrFail($id);
+
+        return view('checkout.confirmation', compact('order'));
     }
 }

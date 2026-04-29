@@ -598,7 +598,7 @@
             max-height: 140px;
             max-width: 100%;
             object-fit: contain;
-            transition: var(--transition);
+            transition: var(--transition), opacity 0.2s ease;
         }
 
         .product-card:hover .product-img-wrapper img {
@@ -1199,8 +1199,15 @@
                                             </div>
                                             <p class="product-desc">{{ $product->description }}</p>
                                             <div class="color-swatches">
-                                                <span class="color-swatch active" style="background:#8B8B8B;"
-                                                    title="Default Color"></span>
+                                                @forelse($product->frame_colors ?? [] as $i => $color)
+                                                    <span class="color-swatch {{ $i === 0 ? 'active' : '' }}"
+                                                        style="background:{{ $color['hex'] }};"
+                                                        title="{{ $color['name'] }}"
+                                                        data-image="{{ asset(!empty($color['image']) ? $color['image'] : $product->image) }}"></span>
+                                                @empty
+                                                    <span class="color-swatch active" style="background:#8B8B8B;"
+                                                        title="Default Color"></span>
+                                                @endforelse
                                             </div>
                                             <div class="btn-action-group">
                                                 <a href="{{ $product->is_contact_lens ? route('prescription.create', ['product_id' => $product->id]) : route('products.show', $product->id) }}" class="btn-view-details"
@@ -1447,6 +1454,17 @@
             $(document).on('click', '.color-swatch', function () {
                 $(this).closest('.color-swatches').find('.color-swatch').removeClass('active');
                 $(this).addClass('active');
+
+                // Swap product card image to the color-specific image
+                var newImage = $(this).data('image');
+                if (newImage) {
+                    var $img = $(this).closest('.product-card').find('.product-img-wrapper img');
+                    $img.css('opacity', 0.3);
+                    setTimeout(function () {
+                        $img.attr('src', newImage);
+                        $img.css('opacity', 1);
+                    }, 200);
+                }
             });
 
             // ---- Mobile filter toggle ----

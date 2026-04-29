@@ -286,7 +286,7 @@
         .main-image-wrapper img {
             max-height: 320px;
             object-fit: contain;
-            transition: var(--transition);
+            transition: var(--transition), opacity 0.25s ease;
         }
 
         .gallery-heart {
@@ -1270,14 +1270,30 @@
                             </div>
                         </div>
                         <div class="thumbnail-row" id="thumbnail-row">
+                            {{-- Main Photo thumbnail — so user can return to it --}}
+                            <div class="thumbnail-item active" data-color-index="0"
+                                data-image="{{ asset($product->image) }}" data-alt="{{ $product->name }} — Front View">
+                                <img src="{{ asset($product->image) }}" alt="{{ $product->name }} — Front View">
+                            </div>
+
+                            {{-- Sub Photo — same color as main, different angle --}}
                             @if(isset($product->images) && $product->images->count() > 0)
-                                @foreach($product->images as $index => $image)
-                                    <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}"
-                                        data-image="{{ asset($image->image_path) }}" data-alt="Thumbnail {{ $index + 1 }}">
-                                        <img src="{{ asset($image->image_path) }}" alt="Thumbnail {{ $index + 1 }}">
-                                    </div>
-                                @endforeach
+                                <div class="thumbnail-item"
+                                    data-image="{{ asset($product->images[0]->image_path) }}" data-alt="{{ $product->name }} — Side View">
+                                    <img src="{{ asset($product->images[0]->image_path) }}" alt="{{ $product->name }} — Side View">
+                                </div>
                             @endif
+
+                            {{-- Color variant images (Colors 2 & 3) --}}
+                            @php $colors = $product->frame_colors ?? []; @endphp
+                            @foreach($colors as $ci => $colorItem)
+                                @if($ci > 0 && !empty($colorItem['image']))
+                                    <div class="thumbnail-item" data-color-index="{{ $ci }}"
+                                        data-image="{{ asset($colorItem['image']) }}" data-alt="{{ $product->name }} — {{ $colorItem['name'] }}">
+                                        <img src="{{ asset($colorItem['image']) }}" alt="{{ $product->name }} — {{ $colorItem['name'] }}">
+                                    </div>
+                                @endif
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -1332,7 +1348,7 @@
                         <div class="color-option-label">COLOR: <span id="color-name">{{ strtoupper($colors[0]['name'] ?? '') }}</span></div>
                         <div class="color-swatches-detail" id="color-swatches">
                             @foreach($colors as $index => $color)
-                                <span class="swatch-circle {{ $index === 0 ? 'active' : '' }}" style="background:{{ $color['hex'] }};" data-color="{{ $color['name'] }}" title="{{ $color['name'] }}"></span>
+                                <span class="swatch-circle {{ $index === 0 ? 'active' : '' }}" style="background:{{ $color['hex'] }};" data-color="{{ $color['name'] }}" title="{{ $color['name'] }}" data-image="{{ asset(!empty($color['image']) ? $color['image'] : $product->image) }}"></span>
                             @endforeach
                         </div>
                         @endif
@@ -1385,12 +1401,12 @@
                             Go to Checkout
                         </button>
 
-                        {{-- Frame + Prescription Lenses: goes to prescription create --}}
-                        <a href="{{ route('prescription.create', ['product_id' => $product->id]) }}" class="btn-add-to-cart"
+                        {{-- Frame + Prescription Lenses: goes to prescription create (auth-gated via JS) --}}
+                        <button type="button" class="btn-add-to-cart"
                             id="btn-frame-lens" style="display:none; background:#1D3557; color:#fff; margin-top:8px;">
                             <i class="fa-solid fa-eye"></i>
                             Customize Your Lenses
-                        </a>
+                        </button>
                     </form>
 
                     <!-- Trust Badges -->
@@ -1543,7 +1559,7 @@
                 $('#mainNavbar').toggleClass('scrolled', $(this).scrollTop() > 50);
             });
 
-            // ---- Thumbnail click → swap main image ----
+            // ---- Thumbnail click → swap main image + sync color swatch ----
             $('#thumbnail-row').on('click', '.thumbnail-item', function () {
                 var $this = $(this);
                 var newSrc = $this.data('image');
@@ -1560,6 +1576,19 @@
                     $mainImg.attr('src', newSrc).attr('alt', newAlt);
                     $mainImg.css('opacity', 1);
                 }, 250);
+
+                // Sync color swatch if this thumbnail is linked to a color
+                var colorIndex = $this.data('color-index');
+                if (colorIndex !== undefined) {
+                    var $swatches = $('#color-swatches .swatch-circle');
+                    if ($swatches.length > 0 && $swatches.eq(colorIndex).length) {
+                        $swatches.removeClass('active');
+                        $swatches.eq(colorIndex).addClass('active');
+                        var colorName = $swatches.eq(colorIndex).data('color') || '';
+                        $('#color-name').text(colorName.toUpperCase());
+                        $('#input-frame-color').val(colorName);
+                    }
+                }
             });
 
             // ---- Gallery heart handler is below (AJAX-based) ----
@@ -1581,12 +1610,29 @@
 
             // ---- Color swatch toggle ----
             $('#color-swatches').on('click', '.swatch-circle', function () {
+                var colorIndex = $(this).index();
                 $('.swatch-circle').removeClass('active');
                 $(this).addClass('active');
                 // Update color name label + hidden input
                 var colorName = $(this).data('color') || '';
                 $('#color-name').text(colorName.toUpperCase());
                 $('#input-frame-color').val(colorName);
+
+                // Swap main gallery image to the color-specific image
+                var newImage = $(this).data('image');
+                if (newImage) {
+                    var $mainImg = $('#main-product-image');
+                    $mainImg.css('opacity', 0.3);
+                    setTimeout(function () {
+                        $mainImg.attr('src', newImage);
+                        $mainImg.css('opacity', 1);
+                    }, 250);
+                }
+
+                // Sync matching thumbnail active state
+                var $thumbs = $('#thumbnail-row .thumbnail-item');
+                $thumbs.removeClass('active');
+                $thumbs.filter('[data-color-index="' + colorIndex + '"]').addClass('active');
             });
 
             // ---- Size select → update hidden input ----
@@ -1600,13 +1646,31 @@
             var checkoutUrl = "{{ route('checkout.index') }}";
             var productId = {{ $product->id }};
 
+            // ---- Auth gate helper ----
+            var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+
+            function showAuthAlert() {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sign In Required',
+                    text: 'You need to sign in before proceeding.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sign In',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#1D3557',
+                    footer: 'Don\'t have an account? <a href="{{ route('register') }}">Register now</a>'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('login') }}";
+                    }
+                });
+            }
+
             function syncPurchaseButtons() {
                 var val = $('input[name="purchase-type"]:checked').val();
                 if (val === 'frame-lens') {
                     $('#btn-frame-only').hide();
                     $('#btn-frame-lens').show();
-                    // Update the href to include product_id
-                    $('#btn-frame-lens').attr('href', prescribeUrl + '?product_id=' + productId);
                 } else {
                     $('#btn-frame-only').show();
                     $('#btn-frame-lens').hide();
@@ -1624,6 +1688,10 @@
 
             // ---- Frame Only: Go directly to checkout (skip cart) ----
             $('#btn-frame-only').on('click', function () {
+                if (!isAuthenticated) {
+                    showAuthAlert();
+                    return;
+                }
                 var $btn = $(this);
                 var pid  = $btn.data('product-id');
                 $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
@@ -1632,6 +1700,15 @@
                 params += '&frame_color=' + encodeURIComponent($('#input-frame-color').val() || '');
                 params += '&frame_size=' + encodeURIComponent($('#input-frame-size').val() || '');
                 window.location.href = '{{ route("checkout.index") }}?' + params;
+            });
+
+            // ---- Frame + Lenses: auth-gated click handler ----
+            $('#btn-frame-lens').on('click', function () {
+                if (!isAuthenticated) {
+                    showAuthAlert();
+                    return;
+                }
+                window.location.href = prescribeUrl + '?product_id=' + productId;
             });
 
             // ---- Review card hover micro-interaction (jQuery) ----
