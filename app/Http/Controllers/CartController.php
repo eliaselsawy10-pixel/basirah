@@ -27,7 +27,7 @@ class CartController extends Controller
         }
 
         $shipping  = 0; // Free shipping
-        $taxRate   = 0.08; // 8% tax
+        $taxRate   = config('shop.tax_rate', 0.08);
         $tax       = round($subtotal * $taxRate, 2);
         $total     = round($subtotal + $shipping + $tax, 2);
 
@@ -112,7 +112,7 @@ class CartController extends Controller
                 $subtotal += $item['price'] * $item['quantity'];
             }
 
-            $taxRate = 0.08;
+            $taxRate = config('shop.tax_rate', 0.08);
             $tax     = round($subtotal * $taxRate, 2);
             $total   = round($subtotal + $tax, 2);
 
@@ -147,7 +147,7 @@ class CartController extends Controller
                 $subtotal += $item['price'] * $item['quantity'];
             }
 
-            $taxRate = 0.08;
+            $taxRate = config('shop.tax_rate', 0.08);
             $tax     = round($subtotal * $taxRate, 2);
             $total   = round($subtotal + $tax, 2);
 

@@ -918,6 +918,214 @@
         .animate-in {
             animation: fadeInUp .5s ease forwards
         }
+
+        /* CUSTOMIZE YOUR LENSES BUTTON */
+        .btn-customize-lenses {
+            width: 100%;
+            margin-top: 10px;
+            padding: 9px 16px;
+            border-radius: var(--r-sm);
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: .78rem;
+            font-weight: 700;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: var(--tr);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            letter-spacing: .3px
+        }
+
+        .btn-customize-lenses:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(29,53,87,.25)
+        }
+
+        /* REVIEWS SECTION */
+        .reviews-section {
+            background: #FFFAF7;
+            padding: 60px 0
+        }
+
+        .reviews-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            margin-bottom: 36px
+        }
+
+        .review-card {
+            background: #fff;
+            border-radius: var(--r-md);
+            padding: 28px 24px;
+            border: 1px solid var(--border-light);
+            height: 100%;
+            transition: var(--tr);
+            display: flex;
+            flex-direction: column
+        }
+
+        .review-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+            border-color: #d0e8f7
+        }
+
+        .reviewer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px
+        }
+
+        .reviewer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-light)
+        }
+
+        .reviewer-info h6 {
+            font-size: .88rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary)
+        }
+
+        .reviewer-info .reviewer-class {
+            font-size: .7rem;
+            color: var(--text-muted);
+            font-weight: 500
+        }
+
+        .review-stars {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 12px
+        }
+
+        .review-stars i {
+            color: var(--star-color);
+            font-size: .75rem
+        }
+
+        .review-text {
+            font-size: .84rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            flex: 1;
+            font-style: italic
+        }
+
+        /* REVIEW FORM */
+        .review-form-wrapper {
+            margin-top: 40px;
+            background: #fff;
+            border-radius: var(--r-md);
+            padding: 32px;
+            border: 1px solid var(--border-light)
+        }
+
+        .review-form-wrapper h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px
+        }
+
+        .star-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px
+        }
+
+        .star-selector i {
+            font-size: 1.4rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color .2s ease, transform .15s ease
+        }
+
+        .star-selector i:hover { transform: scale(1.2) }
+        .star-selector i.active { color: var(--star-color) }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 100px;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--r-sm);
+            padding: 14px 16px;
+            font-size: .88rem;
+            font-family: var(--font);
+            color: var(--text-primary);
+            resize: vertical;
+            transition: var(--tr);
+            margin-bottom: 16px
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: var(--accent-dark);
+            box-shadow: 0 0 0 3px rgba(189,227,249,.4)
+        }
+
+        .review-textarea::placeholder { color: var(--text-muted) }
+
+        .btn-submit-review {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: .88rem;
+            padding: 12px 32px;
+            border: none;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            transition: var(--tr);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none
+        }
+
+        .btn-submit-review:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(29,53,87,.2);
+            color: #fff
+        }
+
+        .btn-submit-review:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .review-product-select {
+            width: 100%;
+            max-width: 400px;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--r-sm);
+            padding: 10px 14px;
+            font-size: .85rem;
+            font-family: var(--font);
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            background: #fff
+        }
+
+        .review-product-select:focus {
+            outline: none;
+            border-color: var(--accent-dark)
+        }
     </style>
 @endpush
 
@@ -1069,27 +1277,37 @@
                                         <div class="p-info">
                                             <div class="p-brand">{{ $product->brand ?? 'BASIRAH' }}</div>
                                             <div class="p-name-row">
-                                                <h5><a href="{{ $product->is_contact_lens ? route('prescription.create', ['product_id' => $product->id]) : route('products.show', $product->id) }}"
-                                                        style="color:var(--text-primary);">{{ $product->name }}</a></h5>
+                                                <h5>{{ $product->name }}</h5>
                                                 @php $isFav = isset(session('favorites', [])[$product->id]); @endphp
                                                 <button class="p-heart {{ $isFav ? 'active' : '' }}" data-id="{{ $product->id }}"
                                                     aria-label="Favorite">
                                                     <i class="{{ $isFav ? 'fa-solid' : 'fa-regular' }} fa-heart"></i>
                                                 </button>
                                             </div>
+                                            @php
+                                                $avgRat = round($product->reviews_avg_rating ?? 0, 1);
+                                                $fullS  = floor($avgRat);
+                                                $halfS  = ($avgRat - $fullS) >= 0.25;
+                                            @endphp
                                             <div class="p-stars">
-                                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                                    class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
-                                                    class="fa-solid fa-star-half-stroke"></i>
-                                                <span>(0)</span>
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= $fullS)
+                                                        <i class="fa-solid fa-star"></i>
+                                                    @elseif($halfS && $i == $fullS + 1)
+                                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                                    @else
+                                                        <i class="fa-regular fa-star"></i>
+                                                    @endif
+                                                @endfor
+                                                <span>({{ $product->reviews_count }})</span>
                                             </div>
                                             <div class="p-wholesale">Wholesale Price</div>
                                             <div class="p-price-row">
                                                 <div class="p-price">${{ number_format($product->price, 2) }} <small>/ box</small></div>
-                                                <a href="{{ route('prescription.create', ['product_id' => $product->id]) }}" class="btn-quick" title="Enter Prescription" style="text-decoration:none;">
-                                                    <i class="fa-solid fa-file-medical"></i>
-                                                </a>
                                             </div>
+                                            <button type="button" class="btn-customize-lenses" data-product-id="{{ $product->id }}" title="Customize Your Lenses">
+                                                <i class="fa-solid fa-eye"></i> Customize Your Lenses
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1106,6 +1324,85 @@
         </div>
         </div>
     </section>
+
+    <!-- ========== REVIEWS SECTION ========== -->
+    @php
+        $allProductIds = $products->pluck('id')->toArray();
+        $lensReviews   = \App\Models\Review::whereIn('product_id', $allProductIds)->latest()->take(6)->get();
+        $lensReviewCnt = \App\Models\Review::whereIn('product_id', $allProductIds)->count();
+    @endphp
+    <section class="reviews-section" id="reviews-section">
+        <div class="container">
+            <h2 class="reviews-title" id="reviews-title">Customer Reviews ({{ $lensReviewCnt }})</h2>
+            <div class="row g-4">
+                @forelse($lensReviews as $review)
+                    <div class="col-md-4">
+                        <div class="review-card" id="review-{{ $review->id }}">
+                            <div class="reviewer-header">
+                                <img src="{{ asset('images/Avatar.png') }}" alt="{{ $review->reviewer_name }} avatar" class="reviewer-avatar">
+                                <div class="reviewer-info">
+                                    <h6>{{ $review->reviewer_name }}</h6>
+                                    <div class="reviewer-class">{{ $review->created_at->format('M d, Y') }}</div>
+                                </div>
+                            </div>
+                            <div class="review-stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $review->rating)
+                                        <i class="fa-solid fa-star"></i>
+                                    @else
+                                        <i class="fa-regular fa-star"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="review-text">{{ $review->comment }}</p>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center text-muted">
+                        <p>No reviews yet for contact lens products.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Review Form -->
+            <div class="review-form-wrapper" id="review-form-wrapper">
+                @auth
+                    <h4><i class="fa-solid fa-pen-to-square"></i> Write a Review</h4>
+                    <form id="review-submit-form">
+                        @csrf
+                        <div style="margin-bottom:14px;">
+                            <label class="option-label" style="display:block; margin-bottom:8px;">Select Product</label>
+                            <select name="product_id" class="review-product-select" id="review-product-select" required>
+                                <option value="" disabled selected>Choose a product to review…</option>
+                                @foreach($products as $p)
+                                    <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="option-label" style="margin-bottom:8px;">Your Rating</div>
+                        <div class="star-selector" id="star-selector">
+                            <i class="fa-regular fa-star" data-value="1"></i>
+                            <i class="fa-regular fa-star" data-value="2"></i>
+                            <i class="fa-regular fa-star" data-value="3"></i>
+                            <i class="fa-regular fa-star" data-value="4"></i>
+                            <i class="fa-regular fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="rating-input" value="0">
+                        <textarea name="comment" class="review-textarea" id="review-comment" placeholder="Share your experience with this product..."></textarea>
+                        <button type="submit" class="btn-submit-review" id="btn-submit-review">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Review
+                        </button>
+                    </form>
+                @else
+                    <h4><i class="fa-solid fa-pen-to-square"></i> Write a Review</h4>
+                    <p style="color:var(--text-muted); font-size:.88rem; margin-bottom:16px;">You must be signed in to leave a review.</p>
+                    <a href="{{ route('login') }}" class="btn-submit-review">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In to Review
+                    </a>
+                @endauth
+            </div>
+        </div>
+    </section>
 @endsection
 
 @push('script')
@@ -1114,11 +1411,39 @@
             // Navbar scroll
             $(window).on('scroll', function () { $('#mainNavbar').toggleClass('scrolled', $(this).scrollTop() > 50) });
 
+            // ---- Auth gate helper ----
+            var isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+
+            function showAuthAlert() {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sign In Required',
+                    text: 'You need to sign in before proceeding.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sign In',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#1D3557',
+                    footer: 'Don\'t have an account? <a href="{{ route('register') }}">Register now</a>'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('login') }}";
+                    }
+                });
+            }
+
+            // ---- Navbar badge helper ----
+            function updateNavBadge(selector, count) {
+                var $badge = $(selector);
+                if (count > 0) {
+                    $badge.text(count).show();
+                } else {
+                    $badge.text('0').hide();
+                }
+            }
+
             // Color Family circle toggle
             $('#color-family').on('click', '.color-circle', function () {
-                // Get the color
                 var color = $(this).data('color');
-                // If already active, deselect
                 if ($(this).hasClass('active')) {
                     $(this).removeClass('active');
                     $('#color-family-input').val('');
@@ -1130,7 +1455,7 @@
                 $('#filter-form').submit();
             });
 
-            // Heart toggle
+            // ---- Heart toggle (with navbar badge update) ----
             $(document).on('click', '.p-heart', function (e) {
                 e.preventDefault();
                 var $btn = $(this);
@@ -1148,25 +1473,11 @@
                             if (res.success) {
                                 $btn.removeClass('active');
                                 $i.removeClass('fa-solid').addClass('fa-regular');
+                                updateNavBadge('#navFavBadge', res.count);
                             }
                         },
                         error: function (xhr) {
-                            if (xhr.status === 401) {
-                                Swal.fire({
-                                    icon: 'info',
-                                    title: 'Sign In Required',
-                                    text: 'You must sign in to save your favorite products.',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Sign In',
-                                    cancelButtonText: 'Cancel',
-                                    confirmButtonColor: '#1D3557',
-                                    footer: 'Don\'t have an account? <a href="{{ route('register') }}">Create an account</a>'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "{{ route('login') }}";
-                                    }
-                                });
-                            }
+                            if (xhr.status === 401) { showAuthAlert(); }
                         }
                     });
                 } else {
@@ -1178,40 +1489,25 @@
                             if (res.success) {
                                 $btn.addClass('active');
                                 $i.removeClass('fa-regular').addClass('fa-solid');
+                                updateNavBadge('#navFavBadge', res.count);
                             }
                         },
                         error: function (xhr) {
-                            if (xhr.status === 401) {
-                                Swal.fire({
-                                    icon: 'info',
-                                    title: 'Sign In Required',
-                                    text: 'You must sign in to save your favorite products.',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Sign In',
-                                    cancelButtonText: 'Cancel',
-                                    confirmButtonColor: '#1D3557',
-                                    footer: 'Don\'t have an account? <a href="{{ route('register') }}">Create an account</a>'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        window.location.href = "{{ route('login') }}";
-                                    }
-                                });
-                            }
+                            if (xhr.status === 401) { showAuthAlert(); }
                         }
                     });
                 }
             });
 
-            // Quick Add to Cart
-            $(document).on('click', '.btn-quick', function (e) {
+            // ---- Customize Your Lenses (auth-gated) ----
+            $(document).on('click', '.btn-customize-lenses', function (e) {
                 e.preventDefault();
-                var name = $(this).data('product');
-                var $btn = $(this);
-                $btn.html('<i class="fa-solid fa-check"></i>').css('background', '#198754');
-                var $bdg = $('#cart-badge');
-                var c = parseInt($bdg.text()) || 0;
-                $bdg.text(c + 1);
-                setTimeout(function () { $btn.html('<i class="fa-solid fa-cart-shopping"></i>').css('background', '') }, 1200);
+                if (!isAuthenticated) {
+                    showAuthAlert();
+                    return;
+                }
+                var pid = $(this).data('product-id');
+                window.location.href = "{{ route('prescription.create') }}?product_id=" + pid;
             });
 
             // Clear All filters
@@ -1231,15 +1527,6 @@
                 $(this).html($inner.hasClass('show') ? '<i class="fa-solid fa-xmark"></i> Hide Filters' : '<i class="fa-solid fa-sliders"></i> Show Filters');
             });
 
-            // Pagination
-            $(document).on('click', '.pagination .page-link', function (e) {
-                e.preventDefault();
-                if (!$(this).parent().hasClass('disabled')) {
-                    $('.pagination .page-item').removeClass('active');
-                    $(this).parent().addClass('active');
-                }
-            });
-
             // Scroll reveal
             if ('IntersectionObserver' in window) {
                 var obs = new IntersectionObserver(function (entries) {
@@ -1247,8 +1534,127 @@
                         if (entry.isIntersecting) { $(entry.target).addClass('animate-in'); obs.unobserve(entry.target) }
                     });
                 }, { threshold: .1 });
-                $('.p-card').each(function () { this.style.opacity = '0'; obs.observe(this) });
+                $('.p-card, .review-card').each(function () { this.style.opacity = '0'; obs.observe(this) });
             }
+
+            // ---- Star Selector (Review Form) ----
+            $('#star-selector i').on('click', function () {
+                var val = $(this).data('value');
+                $('#rating-input').val(val);
+                $('#star-selector i').each(function () {
+                    if ($(this).data('value') <= val) {
+                        $(this).removeClass('fa-regular').addClass('fa-solid active');
+                    } else {
+                        $(this).removeClass('fa-solid active').addClass('fa-regular');
+                    }
+                });
+            });
+
+            $('#star-selector i').on('mouseenter', function () {
+                var val = $(this).data('value');
+                $('#star-selector i').each(function () {
+                    $(this).toggleClass('active', $(this).data('value') <= val);
+                });
+            });
+
+            $('#star-selector').on('mouseleave', function () {
+                var selected = parseInt($('#rating-input').val());
+                $('#star-selector i').each(function () {
+                    if ($(this).data('value') <= selected) {
+                        $(this).removeClass('fa-regular').addClass('fa-solid active');
+                    } else {
+                        $(this).removeClass('fa-solid active').addClass('fa-regular');
+                    }
+                });
+            });
+
+            // ---- Review Form Submission (AJAX) ----
+            $('#review-submit-form').on('submit', function (e) {
+                e.preventDefault();
+
+                var rating = parseInt($('#rating-input').val());
+                var comment = $('#review-comment').val().trim();
+                var productId = $('#review-product-select').val();
+
+                if (!productId) {
+                    Swal.fire({ icon: 'warning', title: 'Select a Product', text: 'Please choose which product you want to review.', confirmButtonColor: '#1D3557' });
+                    return;
+                }
+                if (rating < 1) {
+                    Swal.fire({ icon: 'warning', title: 'Please select a rating', text: 'Click on the stars to rate this product.', confirmButtonColor: '#1D3557' });
+                    return;
+                }
+                if (comment.length < 5) {
+                    Swal.fire({ icon: 'warning', title: 'Review too short', text: 'Please write at least 5 characters.', confirmButtonColor: '#1D3557' });
+                    return;
+                }
+
+                var $btn = $('#btn-submit-review');
+                var origHtml = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...');
+
+                $.ajax({
+                    url: '{{ route("reviews.store") }}',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (response) {
+                        if (response.success) {
+                            var starsHtml = '';
+                            for (var i = 1; i <= 5; i++) {
+                                starsHtml += i <= response.review.rating
+                                    ? '<i class="fa-solid fa-star"></i>'
+                                    : '<i class="fa-regular fa-star"></i>';
+                            }
+
+                            var cardHtml = '<div class="col-md-4">' +
+                                '<div class="review-card animate-in" id="review-' + response.review.id + '">' +
+                                    '<div class="reviewer-header">' +
+                                        '<img src="{{ asset("images/Avatar.png") }}" alt="' + response.review.reviewer_name + ' avatar" class="reviewer-avatar">' +
+                                        '<div class="reviewer-info">' +
+                                            '<h6>' + response.review.reviewer_name + '</h6>' +
+                                            '<div class="reviewer-class">' + response.review.date + '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="review-stars">' + starsHtml + '</div>' +
+                                    '<p class="review-text">' + response.review.comment + '</p>' +
+                                '</div>' +
+                            '</div>';
+
+                            var $grid = $('#reviews-section .row.g-4');
+                            $grid.find('.text-center.text-muted').parent().remove();
+                            $grid.prepend(cardHtml);
+
+                            var $title = $('#reviews-title');
+                            var currentCount = parseInt($title.text().match(/\d+/) || 0) + 1;
+                            $title.text('Customer Reviews (' + currentCount + ')');
+
+                            // Reset form
+                            $('#review-comment').val('');
+                            $('#rating-input').val('0');
+                            $('#review-product-select').val('');
+                            $('#star-selector i').removeClass('fa-solid active').addClass('fa-regular');
+
+                            Swal.fire({
+                                toast: true, position: 'bottom-end', icon: 'success',
+                                title: response.message || 'Review submitted!',
+                                showConfirmButton: false, timer: 3000, timerProgressBar: true
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        var errMsg = 'Failed to submit review.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        Swal.fire({
+                            toast: true, position: 'bottom-end', icon: 'error',
+                            title: errMsg, showConfirmButton: false, timer: 3500, timerProgressBar: true
+                        });
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false).html(origHtml);
+                    }
+                });
+            });
         });
     </script>
 @endpush

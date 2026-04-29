@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Favorite;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
@@ -11,8 +14,10 @@ class FavoriteController extends Controller
      */
     public function index()
     {
-        // Demo favorite items (replace with database/session in production)
-        $favorites = session()->get('favorites', []);
+        $favorites = Favorite::with('product')
+            ->where('user_id', Auth::id())
+            ->get()
+            ->keyBy('product_id');
 
         return view('favorites.index', compact('favorites'));
     }
@@ -22,16 +27,17 @@ class FavoriteController extends Controller
      */
     public function destroy($id)
     {
-        $favorites = session()->get('favorites', []);
+        $deleted = Favorite::where('user_id', Auth::id())
+            ->where('product_id', $id)
+            ->delete();
 
-        if (isset($favorites[$id])) {
-            unset($favorites[$id]);
-            session()->put('favorites', $favorites);
+        if ($deleted) {
+            $count = Favorite::where('user_id', Auth::id())->count();
 
             return response()->json([
                 'success' => true,
-                'isEmpty' => empty($favorites),
-                'count'   => count($favorites),
+                'isEmpty' => $count === 0,
+                'count'   => $count,
             ]);
         }
 
@@ -39,31 +45,40 @@ class FavoriteController extends Controller
     }
 
     /**
-     * Add an item to favorites.
+     * Add an item to favorites (AJAX).
      */
     public function store(Request $request)
     {
         $request->validate(['product_id' => 'required|integer|exists:products,id']);
 
         $productId = $request->input('product_id');
-        $favorites = session()->get('favorites', []);
 
-        if (!isset($favorites[$productId])) {
-            // Load from DB
-            $product = \App\Models\Product::findOrFail($productId);
-            $favorites[$productId] = [
-                'name'     => $product->name,
-                'category' => $product->category,
-                'price'    => $product->price,
-                'image'    => $product->image,
-                'inStock'  => $product->stock > 0,
-            ];
-            session()->put('favorites', $favorites);
+        // Toggle: if already favorited, remove it
+        $existing = Favorite::where('user_id', Auth::id())
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            $count = Favorite::where('user_id', Auth::id())->count();
+            return response()->json([
+                'success'  => true,
+                'action'   => 'removed',
+                'count'    => $count,
+            ]);
         }
+
+        Favorite::create([
+            'user_id'    => Auth::id(),
+            'product_id' => $productId,
+        ]);
+
+        $count = Favorite::where('user_id', Auth::id())->count();
 
         return response()->json([
             'success' => true,
-            'count'   => count($favorites),
+            'action'  => 'added',
+            'count'   => $count,
         ]);
     }
 }

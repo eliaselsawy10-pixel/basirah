@@ -108,14 +108,29 @@ class ProductsController extends Controller
         session()->forget('lens_order');
         session()->forget('frame_only_order');
 
-        $product         = Product::with('images')->findOrFail($id);
+        $product = Product::with('images')->findOrFail($id);
+
+        // Related products: same category first, then fill with random
         $relatedProducts = Product::where('id', '!=', $id)
+                                  ->where('category', $product->category)
+                                  ->where('category', '!=', 'Contact Lenses')
                                   ->inRandomOrder()
                                   ->take(4)
                                   ->get();
 
-        // Product reviews
-        $productReviews = \App\Models\Review::forProduct($id)->latest()->take(3)->get();
+        // If not enough from same category, fill with random others
+        if ($relatedProducts->count() < 4) {
+            $fill = Product::where('id', '!=', $id)
+                           ->where('category', '!=', 'Contact Lenses')
+                           ->whereNotIn('id', $relatedProducts->pluck('id'))
+                           ->inRandomOrder()
+                           ->take(4 - $relatedProducts->count())
+                           ->get();
+            $relatedProducts = $relatedProducts->merge($fill);
+        }
+
+        // Product reviews — show up to 10, with total count for "load more"
+        $productReviews = \App\Models\Review::forProduct($id)->latest()->take(10)->get();
         $reviewCount    = \App\Models\Review::forProduct($id)->count();
         $avgRating      = \App\Models\Review::forProduct($id)->avg('rating') ?? 0;
 
@@ -170,6 +185,8 @@ class ProductsController extends Controller
                 $query->orderBy('name');
                 break;
         }
+
+        $query->withCount('reviews')->withAvg('reviews', 'rating');
 
         $lenses = $query->paginate(12)->withQueryString();
 

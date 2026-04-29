@@ -811,7 +811,7 @@
 
                                 <!-- Forgot Password — right-aligned below password -->
                                 <div class="forgot-row stagger-4">
-                                    <a href="#" class="forgot-link" id="forgotPasswordLink">Forgot Password?</a>
+                                    <a href="{{ route('password.request') }}" class="forgot-link" id="forgotPasswordLink">Forgot Password?</a>
                                 </div>
 
                                 <!-- Remember Me -->
