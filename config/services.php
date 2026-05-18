@@ -37,16 +37,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Google Cloud Vision (Prescription OCR)
+    | Google Gemini (Prescription AI Extraction)
     |--------------------------------------------------------------------------
     */
-    'google_vision' => [
-        'project_id'  => env('GOOGLE_CLOUD_PROJECT_ID'),
-        'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS', 'storage/app/google/service-account.json'),
-    ],
-
-    'ocr' => [
-        'confidence_threshold' => (float) env('OCR_CONFIDENCE_THRESHOLD', 0.75),
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
     ],
 
 ];

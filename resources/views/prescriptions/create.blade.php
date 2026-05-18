@@ -1154,12 +1154,12 @@
 
                 <!-- DRAG & DROP ZONE -->
                 <div class="upload-zone" id="uploadZone">
-                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp">
                     <div class="upload-icon" id="uploadIcon">
                         <i class="fas fa-cloud-arrow-up"></i>
                     </div>
                     <h4 id="uploadTitle">Drag & Drop Prescription Photo</h4>
-                    <p class="upload-desc" id="uploadDesc">Supports PDF, JPG, or PNG files. Please ensure all<br>values
+                    <p class="upload-desc" id="uploadDesc">Supports JPG, PNG, or WebP images. Please ensure all<br>values
                         (SPH, CYL, Axis) are clearly visible.</p>
                     <button type="button" class="btn-browse" id="btnBrowse">Browse Files</button>
                     <div class="upload-preview" id="uploadPreview">
@@ -1481,9 +1481,9 @@
 
             // Handle selected file and trigger OCR
             async function handleFile(file) {
-                var validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                var validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
                 if (validTypes.indexOf(file.type) === -1) {
-                    showToast('Invalid file type. Please use PDF, JPG, or PNG.', 'error');
+                    showToast('Invalid file type. Please use JPG, PNG, or WebP.', 'error');
                     return;
                 }
 
@@ -1575,7 +1575,7 @@
                 $('#uploadPreview').removeClass('show');
                 $uploadZone.removeClass('has-file');
                 $('#uploadTitle').text('Drag & Drop Prescription Photo');
-                $('#uploadDesc').html('Supports PDF, JPG, or PNG files. Please ensure all<br>values (SPH, CYL, Axis) are clearly visible.');
+                $('#uploadDesc').html('Supports JPG, PNG, or WebP images. Please ensure all<br>values (SPH, CYL, Axis) are clearly visible.');
                 $('#uploadIcon').html('<i class="fas fa-cloud-arrow-up"></i>');
                 $('#btnBrowse').show();
             });

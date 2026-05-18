@@ -9,27 +9,17 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    /**
-     * Display the login form.
-     *
-     * @return \Illuminate\View\View
-     */
+
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function login(Request $request)
     {
         // Validate the incoming request data
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
@@ -37,6 +27,7 @@ class LoginController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            // Regenerate session ID after login to prevent session fixation attacks (keeps session data intact)
             $request->session()->regenerate();
 
             // Redirect doctors to their dashboard
@@ -44,8 +35,13 @@ class LoginController extends Controller
                 return redirect()->intended('/doctor/dashboard');
             }
 
+            if (Auth::user()->isAdmin()) {
+                return redirect()->intended('/admin/dashboard');
+            }
+
             return redirect()->intended('/');
         }
+
 
         // Authentication failed — redirect back with errors
         return back()->withErrors([
@@ -53,15 +49,6 @@ class LoginController extends Controller
         ])->onlyInput('email');
     }
 
-    /**
-     * Log the user out of the application.
-     *
-     * Clean up any abandoned 'submitted' prescriptions before
-     * flushing the session. 'Ordered' records stay as history.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function logout(Request $request)
     {
         // Delete abandoned prescriptions (never ordered) for this user
@@ -75,6 +62,9 @@ class LoginController extends Controller
 
         // Flushes ALL session data: cart, prescription, lens_order, etc.
         $request->session()->invalidate();
+
+        // Regenerate CSRF token after logout so that any previously opened pages, old forms,
+        // or attempts to reuse an old session become invalid and cannot be used again for security reasons
         $request->session()->regenerateToken();
 
         return redirect('/');
