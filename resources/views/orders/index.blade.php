@@ -4,6 +4,171 @@
 
 @push('style')
 <style>
+    :root {
+            --primary: #BDE3F9;
+            --primary-hover: #9AD4F5;
+            --primary-dark: #68B8E8;
+            --dark: #1a1a2e;
+            --body-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --border-light: #eee;
+            --section-bg: #f8fafc;
+            --font-family: 'Inter', sans-serif;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+    .navbar-basirah {
+            background: #ffffff;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-basirah.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #1D3557;
+            letter-spacing: -0.3px;
+            text-decoration: none;
+        }
+
+        .navbar-brand-logo:hover {
+            color: #1D3557;
+        }
+
+        .navbar-brand-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #BDE3F9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #1D3557;
+        }
+
+        .navbar-basirah .nav-link {
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .navbar-basirah .nav-link:hover,
+        .navbar-basirah .nav-link.active {
+            color: #1D3557;
+            font-weight: 600;
+        }
+
+        /* Search Box */
+        .navbar-search-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-search-input {
+            background: transparent;
+            border: none;
+            color: #1D3557;
+            padding: 7px 12px;
+            font-size: 0.85rem;
+            width: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-search-box:focus-within .navbar-search-input {
+            width: 180px;
+            opacity: 1;
+            background: #f5f7fa;
+            border: 1.5px solid #e8eaed;
+            border-radius: 24px;
+            padding: 7px 16px;
+        }
+
+        .navbar-search-input:focus {
+            outline: none;
+            border-color: #1D3557;
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.06);
+        }
+
+        .navbar-search-input::placeholder {
+            color: rgba(29, 53, 87, 0.35);
+        }
+
+        /* Icon Buttons (Search, Fav, Cart) */
+        .btn-nav-icon,
+        .cart-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.25s ease;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-nav-icon:hover,
+        .cart-icon:hover {
+            color: #1D3557;
+            background: #f0f4f8;
+        }
+
+        /* Badges */
+        .btn-nav-icon .nav-badge,
+        .cart-badge {
+            position: absolute;
+            top: 0px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
+            background: #1D3557;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
     .orders-wrapper {
         min-height: 80vh;
         padding: 50px 20px;
@@ -173,9 +338,142 @@
         color: #fff;
         transform: translateY(-2px);
     }
+    .footer-section {
+            background: #f8fafc;
+            padding: 60px 0 0;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+        }
+
+        .footer-logo .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .footer-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 280px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-social a {
+            text-decoration: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-social a:hover {
+            background: var(--primary);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .footer-heading {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .use_case {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            font-size: 0.82rem;
+        }
+
+        .use_case li {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-dark);
+            padding-left: 4px;
+        }
+
+        .footer-bottom {
+            background: #f0f2f5;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        .footer-bottom p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+        }
+
+        .footer-bottom-links a {
+            text-decoration: none;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .footer-bottom-links a:hover {
+            color: var(--primary-dark);
+        }
 </style>
 @endpush
-
+@section('navbar')
+    @include('layouts.partials.navbar-default')
+@endsection
 @section('content')
 <div class="orders-wrapper">
     <div class="orders-container">
@@ -242,3 +540,5 @@
     </div>
 </div>
 @endsection
+
+

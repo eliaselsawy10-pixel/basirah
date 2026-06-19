@@ -252,7 +252,7 @@
 
 
         /* ========================================
-                       FAVORITES PAGE HEADER
+                    FAVORITES PAGE HEADER
                     ======================================== */
         .fav-wrapper {
             padding: 20px 0 80px;
