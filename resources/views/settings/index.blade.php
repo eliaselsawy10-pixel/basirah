@@ -5,7 +5,7 @@
 @push('style')
     <style>
         /* ========================================
-                       CSS CUSTOM PROPERTIES (BRAND TOKENS)
+                    CSS CUSTOM PROPERTIES (BRAND TOKENS)
                     ======================================== */
         :root {
             --primary: #BDE3F9;
@@ -658,6 +658,17 @@
 
         .footer-links li {
             margin-bottom: 10px;
+        }
+        .use_case {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            font-size: 0.82rem;
+        }
+
+        .use_case li {
+            margin-bottom: 15px;
+            color: var(--text-muted);
         }
 
         .footer-links a {
